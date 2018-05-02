@@ -4,6 +4,14 @@ import * as d3 from "d3";
 import "./scroll.css";
 
 export default class Scrollytelling extends React.Component{
+
+    constructor(props){
+        super(props);
+    }
+
+    componentDidMount(){
+    }
+
     render(){
         return (
             <div id="scrollytelling">
@@ -78,8 +86,10 @@ export default class Scrollytelling extends React.Component{
                         FIN
                     </section>
                 </div>
+
                 <div id = "vis">
                 </div>
+                
             </div>
         );
     }
