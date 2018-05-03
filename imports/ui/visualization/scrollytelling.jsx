@@ -50,12 +50,40 @@ export default class Scrollytelling extends React.Component{
         
         if(this.state.currentIndex !== sectionIndex){
             this.state.currentIndex = sectionIndex;
-            this.active();
+            this.active(sectionIndex);
         }
       }
 
-      active(){
-          console.log("hola");
+      active(i){
+          let functions = [];
+          let step0 = function (){
+              let g = d3.select("#vis");
+              g.enter()
+              .append("svg").attr("width", 200).attr("height", 200)
+              .append("circle").attr("cx", 25).attr("cy", 25).attr("r", 25).style("fill", "blue");
+          }
+
+          functions.push(step0);
+
+          let step1 = function (){
+            let g = d3.select("#vis");
+            g.enter()
+            .append("svg").attr("width", 200).attr("height", 200)
+            .append("circle").attr("cx", 25).attr("cy", 25).attr("r", 25).style("fill", "purple");
+        }
+
+        functions.push(step1);
+
+        let step2 = function (){
+            let g = d3.select("#vis");
+            g.enter()
+            .append("svg").attr("width", 200).attr("height", 200)
+            .append("circle").attr("cx", 25).attr("cy", 25).attr("r", 25).style("fill", "red");
+        }
+
+        functions.push(step2);
+
+        functions[i]();
       }
 
     render(){
