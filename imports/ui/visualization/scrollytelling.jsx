@@ -18,6 +18,13 @@ export default class Scrollytelling extends React.Component{
 
     componentDidMount(){
         window.addEventListener('scroll', this.handleScroll, { passive: true });
+
+        let step1 = function (){
+            let g = d3.select("#vis");
+            g.append("svg").attr("width", 200).attr("height", 200)
+        }
+
+        step1();
     }
 
     componentWillUnmount(){
@@ -57,28 +64,25 @@ export default class Scrollytelling extends React.Component{
       active(i){
           let functions = [];
           let step0 = function (){
-              let g = d3.select("#vis");
-              g.enter()
-              .append("svg").attr("width", 200).attr("height", 200)
-              .append("circle").attr("cx", 25).attr("cy", 25).attr("r", 25).style("fill", "blue");
+              d3.selectAll("circle").remove();
+              let g = d3.select("svg");
+              g.append("circle").attr("cx", 25).attr("cy", 25).attr("r", 25).style("fill", "blue");
           }
 
           functions.push(step0);
 
           let step1 = function (){
-            let g = d3.select("#vis");
-            g.enter()
-            .append("svg").attr("width", 200).attr("height", 200)
-            .append("circle").attr("cx", 25).attr("cy", 25).attr("r", 25).style("fill", "purple");
+            d3.selectAll("circle").remove();
+            let g = d3.select("svg");
+            g.append("circle").attr("cx", 25).attr("cy", 25).attr("r", 25).style("fill", "purple");
         }
 
         functions.push(step1);
 
         let step2 = function (){
-            let g = d3.select("#vis");
-            g.enter()
-            .append("svg").attr("width", 200).attr("height", 200)
-            .append("circle").attr("cx", 25).attr("cy", 25).attr("r", 25).style("fill", "red");
+            d3.selectAll("circle").remove();
+            let g = d3.select("svg");
+            g.append("circle").attr("cx", 25).attr("cy", 25).attr("r", 25).style("fill", "red");
         }
 
         functions.push(step2);
