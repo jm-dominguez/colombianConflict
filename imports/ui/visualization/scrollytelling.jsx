@@ -18,14 +18,21 @@ export default class Scrollytelling extends React.Component {
 
     componentDidMount() {
         window.addEventListener('scroll', this.handleScroll, { passive: true });
-
-        let step1 = function () {
-            let g = d3.select("#vis");
-            g.append("svg").attr("width", 200).attr("height", 200)
+        let step0 = function (){
+            let t = d3.transition().duration(1000);
+            d3.select("svg").remove();
+            d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
+            let g = d3.select("svg");
+            g.append("svg:image")
+            .attr('xlink:href', 'https://secure.i.telegraph.co.uk/multimedia/archive/01123/farc-colombia_1123812c.jpg')
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .style("opacity", 0)
+            .transition(t)
+            .style("opacity", 1);
         }
 
-        step1();
-
+        step0();
         var myData = [80,80,20,20],
             margin = { top: 10, bottom: 20, left: 50, right: 10 },
             width = 300,
@@ -136,9 +143,15 @@ export default class Scrollytelling extends React.Component {
           let step1 = function (){
             let t = d3.transition().duration(1000);
             d3.select("svg").remove();
-            d3.select("#vis").append("svg");
+            d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
             let g = d3.select("svg");
-            g.append("circle").attr("cx", 25).attr("cy", 25).attr("r", 25).transition(t).style("fill", "purple");
+            g.append("svg:image")
+            .attr('xlink:href', 'https://static.iris.net.co/arcadia/upload/images/2016/4/8/47994_1.jpg')
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .style("opacity", 0)
+            .transition(t)
+            .style("opacity", 1);
         }
 
         functions.push(step1);
@@ -146,9 +159,15 @@ export default class Scrollytelling extends React.Component {
         let step2 = function (){
             let t = d3.transition().duration(1000);
             d3.select("svg").remove();
-            d3.select("#vis").append("svg");
+            d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
             let g = d3.select("svg");
-            g.append("circle").attr("cx", 25).attr("cy", 25).attr("r", 25).transition(t).style("fill", "red");
+            g.append("svg:image")
+            .attr('xlink:href', 'http://www.nexofin.com/archivos/2016/09/colombia-farc-paz-750x375.jpg')
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .style("opacity", 0)
+            .transition(t)
+            .style("opacity", 1);
         }
 
         functions.push(step2);
