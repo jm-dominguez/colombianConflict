@@ -18,13 +18,6 @@ export default class Scrollytelling extends React.Component{
 
     componentDidMount(){
         window.addEventListener('scroll', this.handleScroll, { passive: true });
-
-        let step1 = function (){
-            let g = d3.select("#vis");
-            g.append("svg").attr("width", 200).attr("height", 200)
-        }
-
-        step1();
     }
 
     componentWillUnmount(){
@@ -64,25 +57,37 @@ export default class Scrollytelling extends React.Component{
       active(i){
           let functions = [];
           let step0 = function (){
-              d3.selectAll("circle").remove();
+              let t = d3.transition().duration(1000);
+              d3.select("svg").remove();
+              d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
               let g = d3.select("svg");
-              g.append("circle").attr("cx", 25).attr("cy", 25).attr("r", 25).style("fill", "blue");
+              g.append("svg:image")
+              .attr('xlink:href', 'https://secure.i.telegraph.co.uk/multimedia/archive/01123/farc-colombia_1123812c.jpg')
+              .attr("width", "100%")
+              .attr("height", "100%")
+              .style("opacity", 0)
+              .transition(t)
+              .style("opacity", 1);
           }
 
           functions.push(step0);
 
           let step1 = function (){
-            d3.selectAll("circle").remove();
+            let t = d3.transition().duration(1000);
+            d3.select("svg").remove();
+            d3.select("#vis").append("svg");
             let g = d3.select("svg");
-            g.append("circle").attr("cx", 25).attr("cy", 25).attr("r", 25).style("fill", "purple");
+            g.append("circle").attr("cx", 25).attr("cy", 25).attr("r", 25).transition(t).style("fill", "purple");
         }
 
         functions.push(step1);
 
         let step2 = function (){
-            d3.selectAll("circle").remove();
+            let t = d3.transition().duration(1000);
+            d3.select("svg").remove();
+            d3.select("#vis").append("svg");
             let g = d3.select("svg");
-            g.append("circle").attr("cx", 25).attr("cy", 25).attr("r", 25).style("fill", "red");
+            g.append("circle").attr("cx", 25).attr("cy", 25).attr("r", 25).transition(t).style("fill", "red");
         }
 
         functions.push(step2);
