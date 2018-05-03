@@ -189,6 +189,7 @@ export default class Scrollytelling extends React.Component {
                 <div id="sections">
                     <section className="step">
                         <h1>Conflicto Armado en Colombia</h1>
+                        <p>
                         <br />
                         Ayuuudddaaa
                         <br />
@@ -219,9 +220,11 @@ export default class Scrollytelling extends React.Component {
                         Ayuuudddaaa
                         <br />
                         Ayuuudddaaa
+                        </p>
                     </section>
                     <section className="step">
                         <h1> Inicio </h1>
+                        <p>
                         <br />
                         Pérdidas
                         <br />
@@ -252,9 +255,11 @@ export default class Scrollytelling extends React.Component {
                         Pérdidas
                         <br />
                         Pérdidas
+                        </p>
                     </section>
                     <section className="step">
                         <h1> Tratado de Paz </h1>
+                        <p>
                         <br />
                         FIN
                         <br />
@@ -287,6 +292,7 @@ export default class Scrollytelling extends React.Component {
                         FIN
                         <br />
                         FIN
+                        </p>
                     </section>
                 </div>
 

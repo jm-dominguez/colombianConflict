@@ -5,7 +5,7 @@
     top: 0px;
     z-index: 90;
     margin-right: 120px;
-    border-right: 10px  inset  gray;
+    border-right: 5px  inset  gray;
   }
   
   .step {
@@ -21,4 +21,12 @@
   
     height: 800px;
     width: 800px;
+  }
+
+  h1{
+    font-family: 'Open Sans', sans-serif;
+  }
+
+  p{
+    font-family: 'Libre Baskerville', serif;
   }
