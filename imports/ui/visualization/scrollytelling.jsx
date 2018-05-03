@@ -25,6 +25,8 @@ export default class Scrollytelling extends React.Component {
             let g = d3.select("svg");
             g.append("svg:image")
             .attr('xlink:href', 'https://secure.i.telegraph.co.uk/multimedia/archive/01123/farc-colombia_1123812c.jpg')
+            .attr("x", 0)
+            .attr("y", 0)
             .attr("width", "100%")
             .attr("height", "100%")
             .style("opacity", 0)
@@ -125,12 +127,14 @@ export default class Scrollytelling extends React.Component {
       active(i){
           let functions = [];
           let step0 = function (){
-              let t = d3.transition().duration(1000);
+              let t = d3.transition().duration(2000);
               d3.select("svg").remove();
               d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
               let g = d3.select("svg");
               g.append("svg:image")
               .attr('xlink:href', 'https://secure.i.telegraph.co.uk/multimedia/archive/01123/farc-colombia_1123812c.jpg')
+              .attr("x", 0)
+              .attr("y", 0)
               .attr("width", "100%")
               .attr("height", "100%")
               .style("opacity", 0)
@@ -141,12 +145,14 @@ export default class Scrollytelling extends React.Component {
         functions.push(step0);
 
           let step1 = function (){
-            let t = d3.transition().duration(1000);
+            let t = d3.transition().duration(2000);
             d3.select("svg").remove();
             d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
             let g = d3.select("svg");
             g.append("svg:image")
             .attr('xlink:href', 'https://static.iris.net.co/arcadia/upload/images/2016/4/8/47994_1.jpg')
+            .attr("x", 0)
+            .attr("y", 0)
             .attr("width", "100%")
             .attr("height", "100%")
             .style("opacity", 0)
@@ -157,12 +163,14 @@ export default class Scrollytelling extends React.Component {
         functions.push(step1);
 
         let step2 = function (){
-            let t = d3.transition().duration(1000);
+            let t = d3.transition().duration(2000);
             d3.select("svg").remove();
             d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
             let g = d3.select("svg");
             g.append("svg:image")
             .attr('xlink:href', 'http://www.nexofin.com/archivos/2016/09/colombia-farc-paz-750x375.jpg')
+            .attr("x", 0)
+            .attr("y", 0)
             .attr("width", "100%")
             .attr("height", "100%")
             .style("opacity", 0)

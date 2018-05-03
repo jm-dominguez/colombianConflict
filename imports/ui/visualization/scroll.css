@@ -4,6 +4,8 @@
     width: 250px;
     top: 0px;
     z-index: 90;
+    margin-right: 120px;
+    border-right: 10px  inset  gray;
   }
   
   .step {
@@ -17,6 +19,6 @@
     z-index: 1;
     margin-left: 0;
   
-    height: 600px;
-    width: 600px;
+    height: 800px;
+    width: 800px;
   }
