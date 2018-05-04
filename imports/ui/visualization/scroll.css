@@ -1,10 +1,10 @@
 #sections {
     position: relative;
     display: inline-block;
-    width: 250px;
+    width: 500px;
     top: 0px;
     z-index: 90;
-    margin-right: 120px;
+    margin-right: 200px;
     border-right: 5px  inset  gray;
   }
   
@@ -31,4 +31,8 @@
   p{
     font-family: 'Libre Baskerville', serif;
     text-align: justify;
+  }
+
+  #SiNo {
+    padding-left:4em
   }
