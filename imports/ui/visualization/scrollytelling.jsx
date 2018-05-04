@@ -164,7 +164,7 @@ export default class Scrollytelling extends React.Component {
             d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
             let g = d3.select("svg");
             g.append("svg:image")
-                .attr('xlink:href', 'http://www.nexofin.com/archivos/2016/09/colombia-farc-paz-750x375.jpg')
+                .attr('xlink:href', 'https://360radio.com.co/wp-content/uploads/2016/09/Santos-Farc-Castro-Colombia.jpg')
                 .attr("x", 0)
                 .attr("y", 0)
                 .attr("width", "100%")
