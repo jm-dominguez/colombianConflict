@@ -10,6 +10,7 @@
   
   .step {
     margin-bottom: 200px;
+    padding-right: 30px;
   }
   
   #vis {
@@ -29,4 +30,5 @@
 
   p{
     font-family: 'Libre Baskerville', serif;
+    text-align: justify;
   }

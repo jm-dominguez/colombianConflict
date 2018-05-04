@@ -190,108 +190,27 @@ export default class Scrollytelling extends React.Component {
                     <section className="step">
                         <h1>Conflicto Armado en Colombia</h1>
                         <p>
-                        <br />
-                        Ayuuudddaaa
-                        <br />
-                        Ayuuudddaaa
-                        <br />
-                        Ayuuudddaaa
-                        <br />
-                        Ayuuudddaaa
-                        <br />
-                        Ayuuudddaaa
-                        <br />
-                        Ayuuudddaaa
-                        <br />
-                        Ayuuudddaaa
-                        <br />
-                        Ayuuudddaaa
-                        <br />
-                        Ayuuudddaaa
-                        <br />
-                        Ayuuudddaaa
-                        <br />
-                        Ayuuudddaaa
-                        <br />
-                        Ayuuudddaaa
-                        <br />
-                        Ayuuudddaaa
-                        <br />
-                        Ayuuudddaaa
-                        <br />
-                        Ayuuudddaaa
+                        Es un conflicto violento que se desarrolla desde la decada de los sesenta hasta la actualidad.
+                        A lo largo de su historia ha tenido diversos actores, entre los cuales destacan: Las FARC, el ELN,
+                        los grupos paramilitares, el gobierno de Colombia y los carteles de la droga. 
                         </p>
                     </section>
                     <section className="step">
-                        <h1> Inicio </h1>
+                        <h1> Antecedentes </h1>
                         <p>
-                        <br />
-                        Pérdidas
-                        <br />
-                        Pérdidas
-                        <br />
-                        Pérdidas
-                        <br />
-                        Pérdidas
-                        <br />
-                        Pérdidas
-                        <br />
-                        Pérdidas
-                        <br />
-                        Pérdidas
-                        <br />
-                        Pérdidas
-                        <br />
-                        Pérdidas
-                        <br />
-                        Pérdidas
-                        <br />
-                        Pérdidas
-                        <br />
-                        Pérdidas
-                        <br />
-                        Pérdidas
-                        <br />
-                        Pérdidas
-                        <br />
-                        Pérdidas
+                        A lo largo de su historia, Colombia se ha encontrado constatemente en conflictos políticos. El 9 de Abril de 1948
+                         con el asesinato de Jorge Eiécer Gaitán, daba inicio el periodo conocido como "La Violencia". Dicho conflicto terminaría 
+                         en el año 1956 con la creación del frente nacional. No obstante, dicho acuerdo generó descontento en los partidos políticos
+                         no tradicionales, lo cual dió lugar a los grupos insurgentes conocidos como bandoleros.
                         </p>
                     </section>
                     <section className="step">
                         <h1> Tratado de Paz </h1>
                         <p>
-                        <br />
-                        FIN
-                        <br />
-                        FIN
-                        <br />
-                        FIN
-                        <br />
-                        FIN
-                        <br />
-                        FIN
-                        <br />
-                        FIN
-                        <br />
-                        FIN
-                        <br />
-                        FIN
-                        <br />
-                        FIN
-                        <br />
-                        FIN
-                        <br />
-                        FIN
-                        <br />
-                        FIN
-                        <br />
-                        FIN
-                        <br />
-                        FIN
-                        <br />
-                        FIN
-                        <br />
-                        FIN
+                        El lunes 26 de Septiembre de 2016, el gobierno de Colombia, comandado por el presidente Juan Manuel Santos,
+                        firma un grupo de acuerdos con las Fuerzas Armadas Revolucionarias Colombianas (FARC), estos son conocidos 
+                        como los acuerdos de paz de La Habana. Después de la retificación de los acuerdos en el congreso, inició el proceso
+                        de desarme y posteriormente, la reintegración a la vida civil.
                         </p>
                     </section>
                 </div>
