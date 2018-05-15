@@ -7,16 +7,19 @@ export default class Scrollytelling extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            containerStart: 0,
-            currentIndex: 0
-        }
-
+        this.containerStart = 0;
+        this.currentIndex  = 0;
         this.handleScroll = this.handleScroll.bind(this);
         this.active = this.active.bind(this);
     }
 
     componentDidMount() {
+        Meteor.call("getTweets", "FARC",(err, result)=>{
+            if(err){
+                throw err;
+            }
+            console.log(result);
+        })
         window.addEventListener('scroll', this.handleScroll, { passive: true });
         let step0 = function () {
             let t = d3.transition().duration(1000);
@@ -94,7 +97,7 @@ export default class Scrollytelling extends React.Component {
         // do something like call `this.setState`
         // access window.scrollY etc
         let container = d3.select("body");
-        let containerStart = this.state.containerStart;
+        let containerStart = this.containerStart;
         let sections = d3.selectAll(".step");
         let pos = window.pageYOffset - 10 - containerStart;
         let sectionPositions = [];
@@ -108,14 +111,14 @@ export default class Scrollytelling extends React.Component {
             sectionPositions.push(top - startPos);
 
         })
-        this.state.containerStart = container.node().getBoundingClientRect().top + window.pageYOffset;
+        this.containerStart = container.node().getBoundingClientRect().top + window.pageYOffset;
 
         let sectionIndex = d3.bisect(sectionPositions, pos);
 
         sectionIndex = Math.min(sections.size() - 1, sectionIndex);
 
-        if (this.state.currentIndex !== sectionIndex) {
-            this.state.currentIndex = sectionIndex;
+        if (this.currentIndex !== sectionIndex) {
+            this.currentIndex = sectionIndex;
             this.active(sectionIndex);
         }
     }
