@@ -1,11 +1,14 @@
+body{
+  background-color: white;
+}
 #sections {
     position: relative;
     display: inline-block;
     width: 500px;
     top: 0px;
     z-index: 90;
-    margin-right: 200px;
-    border-right: 5px  inset  gray;
+    margin-right: 120px;
+   
   }
   
   .step {
@@ -25,12 +28,16 @@
   }
 
   h1{
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Open Sans', sans-serif !important;
+    color: black;
+    font-size: 20px;
   }
 
   p{
-    font-family: 'Libre Baskerville', serif;
+    font-family: 'Libre Baskerville', serif !important;
     text-align: justify;
+    color: #444;
+    font-size: 15px;
   }
 
   #SiNo {

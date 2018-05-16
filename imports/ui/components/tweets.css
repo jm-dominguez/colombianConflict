@@ -1,0 +1,14 @@
+.tweet-img{
+    border-radius: 50%;
+}
+.tweet{
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e6ecf0;
+}
+.tweeter-name{
+    display: inline;
+}
+.tweeter-screen{
+    display:inline;
+    color: #657786;
+}
