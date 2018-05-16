@@ -23,12 +23,36 @@ export default class Scrollytelling extends React.Component {
             if(err){
                 throw err;
             }
-            console.log(result);
 
             this.setState({
                 farcTweets: result
             });
         })
+        Meteor.call("getTweets", "Uribe", (err, result)=>{
+            if(err){
+                throw err;
+                
+            }
+            this.setState({
+                uribeTweets: result
+            });
+        });
+        Meteor.call("getTweets", "El%20caguan", (err, result)=>{
+            if(err){
+                throw err;
+            }
+            this.setState({
+                caguanTweets: result
+            });
+        });
+        Meteor.call("getTweets", "palacio%20de%20justicia", (err, result)=>{
+            if(err){
+                throw err;
+            }
+            this.setState({
+                pJusticiaTweets: result
+            })
+        });
 
     }
 

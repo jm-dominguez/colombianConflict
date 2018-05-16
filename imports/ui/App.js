@@ -5,7 +5,7 @@ export default class App extends React.Component{
 
     render() {
         return (
-            <div id="main">
+            <div id="main" className="container">
                 <Scrollytelling/>
             </div>
         );
