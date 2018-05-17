@@ -1,6 +1,8 @@
 import React from "react";
 import * as d3 from "d3";
 import Tweet from "../components/tweets.jsx";
+import Login from "./Login.jsx";
+import SignUp from "./SignUp.jsx";
 
 import "./scroll.css";
 
@@ -14,7 +16,7 @@ export default class Scrollytelling extends React.Component {
         this.active = this.active.bind(this);
         this.renderTweets = this.renderTweets.bind(this);
         this.state = {
-
+            status: "Login"
         }
     }
 
@@ -28,25 +30,25 @@ export default class Scrollytelling extends React.Component {
                 farcTweets: result
             });
         })
-        Meteor.call("getTweets", "Uribe", (err, result)=>{
-            if(err){
+        Meteor.call("getTweets", "Uribe", (err, result) => {
+            if (err) {
                 throw err;
-                
+
             }
             this.setState({
                 uribeTweets: result
             });
         });
-        Meteor.call("getTweets", "El%20caguan", (err, result)=>{
-            if(err){
+        Meteor.call("getTweets", "El%20caguan", (err, result) => {
+            if (err) {
                 throw err;
             }
             this.setState({
                 caguanTweets: result
             });
         });
-        Meteor.call("getTweets", "palacio%20de%20justicia", (err, result)=>{
-            if(err){
+        Meteor.call("getTweets", "palacio%20de%20justicia", (err, result) => {
+            if (err) {
                 throw err;
             }
             this.setState({
@@ -306,7 +308,7 @@ export default class Scrollytelling extends React.Component {
         }
 
         functions.push(step3);
-        
+
         let step4 = function () {
             let t = d3.transition().duration(2000);
             d3.select("svg").remove();
@@ -386,13 +388,22 @@ export default class Scrollytelling extends React.Component {
                             <div id="vis">
                             </div>
 
-                            <br/>
+                            <br />
+                            <div className="row">
+                                <div className="col-md-8">
+                                    <h2>Ingresa para poder participar en la encuesta</h2>
+                                    {
+                                        this.state.status ? (<Login />) : (<SignUp />)
+                                    }
+                                </div>
+                            </div>
+                            <br />
                             <h2>Participa en una pequeña encuesta sobre el conflicto armado en Colombia</h2>
-                            <br/>
+                            <br />
                             <div className="row">
                                 <div className="col-md-1"></div>
                                 <div className="col-md-5">
-                                    
+
                                     <div className="questions">
                                         <fieldset className="form-group" onChange={this.handleChangePregunta1}>
                                             <legend>¿Estás de acuerdo con la realización del acuerdo de paz con las FARC?</legend>
