@@ -15,9 +15,30 @@ export default class Scrollytelling extends React.Component {
         this.handleScroll = this.handleScroll.bind(this);
         this.active = this.active.bind(this);
         this.renderTweets = this.renderTweets.bind(this);
+        this.handleSignUpButton = this.handleSignUpButton.bind(this);
+        this.handleLoginButton = this.handleLoginButton.bind(this);
+        this.renderButtons = this.renderButtons.bind(this);
+        this.handleName = this.handleName.bind(this);
+        this.handleEmail = this.handleEmail.bind(this);
+        this.handlePassword = this.handlePassword.bind(this);
+        this.handleConfirmPassword = this.handleConfirmPassword.bind(this);
+        this.handleCreateAccount = this.handleCreateAccount.bind(this);
+        this.handleLogin = this.handleLogin.bind(this);
         this.state = {
             status: "Login"
         }
+    }
+
+    handleSignUpButton(e) {
+        e.preventDefault();
+        this.setState({ status: "SignUp" })
+        console.log(this.state);
+    }
+
+    handleLoginButton(e) {
+        e.preventDefault();
+        this.setState({ status: "Login" });
+        console.log(this.state);
     }
 
     componentWillMount() {
@@ -329,6 +350,150 @@ export default class Scrollytelling extends React.Component {
         functions[i]();
     }
 
+    handleName(e) {
+        this.setState({ name: e.target.value });
+    }
+
+    handleEmail(e) {
+        this.setState({ email: e.target.value });
+    }
+
+    handlePassword(e) {
+        this.setState({ password: e.target.value });
+    }
+
+    handleConfirmPassword(e) {
+        this.setState({ confirmPassword: e.target.value });
+    }
+
+    handleCreateAccount(e) {
+        e.preventDefault();
+        if (this.state.name === "") {
+            alert("Por favor ingresa un nombre válido");
+        }
+        else if (this.state.email === "") {
+            alert("Por favor ingresa un correo válido");
+        }
+        else if (this.state.password === "") {
+            alert("Por favor ingresa la contraseña");
+        }
+        else if (this.state.password.length < 6) {
+            alert("Por favor ingresa una contraseña con 6 caracteres o más");
+        }
+        else if (this.state.confirmPassword === "") {
+            alert("Por favor confirma tu contraseña");
+        }
+        else if (this.state.password !== this.state.confirmPassword) {
+            alert("Las contraseñas no coinciden");
+        }
+        else {
+            try {
+                Accounts.createUser({
+                    email: this.state.email,
+                    password: this.state.password,
+                    profile: {
+                        name: this.state.name
+                    }
+                }, (err) => {
+                    if (err) {
+                        alert(err);
+                    }
+                    else {
+                        alert("Cuenta creada exitosamente");
+                    }
+                });
+            }
+            catch (e) {
+                alert(e);
+            }
+
+        }
+    }
+
+    handleLogin(e) {
+        e.preventDefault();
+        if (this.state.email == "") {
+            alert("Por favor ingresa un correo válido");
+        }
+        else if (this.state.password == "") {
+            alert("Por favor ingresa la contraseña");
+        }
+        else {
+            Meteor.loginWithPassword(this.state.email, this.state.password, (err) => {
+                if (err) {
+                    alert(err);
+                }
+                else {
+                    alert("Ingresado correctamente");
+                    this.setState({ status: "Loged" })
+                }
+            });
+        }
+    }
+
+    renderButtons() {
+        if (this.state.status === "Login") {
+            return (
+                <div>
+                    <h2>Ingresa para poder participar en la encuesta</h2>
+                    <button id="login" type="button" className="btn btn-primary" onClick={this.handleLoginButton}> Iniciar sesión </button>
+                    <button id="signup" type="button" className="btn btn-primary" onClick={this.handleSignUpButton}> Registrate </button>
+                    <br />
+                    <form>
+                        <div className="form-group">
+                            <label htmlFor="email">Correo:</label>
+                            <input type="email" className="form-control" id="email" placeholder="Ingresa tu email" name="email" onChange={this.handleEmail} />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="pwd">Contraseña:</label>
+                            <input type="password" className="form-control" id="pwd" placeholder="Ingresa tu contraseña" name="pswd" onChange={this.handlePassword} />
+                        </div>
+                        <br />
+                        <button type="submit" className="btn btn-primary" onClick={this.handleLogin}>Ingresar</button>
+                    </form>
+                </div>
+            )
+        }
+        else if (this.state.status === "SignUp") {
+            return (
+                <div>
+                    <h2>Ingresa para poder participar en la encuesta</h2>
+                    <button id="login" type="button" className="btn btn-primary" onClick={this.handleLoginButton}> Iniciar sesión </button>
+                    <button id="signup" type="button" className="btn btn-primary" onClick={this.handleSignUpButton}> Registrate </button>
+                    <br />
+                    <form>
+                        <div className="form-group">
+                            <label htmlFor="email">Nombre:</label>
+                            <input type="text" className="form-control" id="name" placeholder="Ingresa tu nombre" name="name" onChange={this.handleName} />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="email">Correo:</label>
+                            <input type="email" className="form-control" id="email" placeholder="Ingresa tu email" name="email" onChange={this.handleEmail} />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="pwd">Contraseña:</label>
+                            <input type="password" className="form-control" id="pwd" placeholder="Ingresa tu contraseña" name="pswd" onChange={this.handlePassword} />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="pwd">Confirma tu contraseña:</label>
+                            <input type="password" className="form-control" id="confirmPswd" placeholder="Confirma tu contraseña" name="confirmPswd" onChange={this.handleConfirmPassword} />
+                        </div>
+                        <br />
+                        <button type="submit" className="btn btn-primary" onClick={this.handleCreateAccount}>Crear cuenta</button>
+
+                    </form>
+                </div>
+            )
+        }
+        else if (this.state.status === "Loged") {
+            return (
+                <div>
+                    <h2>Hola <strong> {Meteor.user().profile.name}</strong></h2>
+                </div>
+            )
+        }
+    }
+
     render() {
         return (
             <div className="container-fluid">
@@ -391,9 +556,8 @@ export default class Scrollytelling extends React.Component {
                             <br />
                             <div className="row">
                                 <div className="col-md-8">
-                                    <h2>Ingresa para poder participar en la encuesta</h2>
                                     {
-                                        this.state.status ? (<Login />) : (<SignUp />)
+                                        this.renderButtons()
                                     }
                                 </div>
                             </div>

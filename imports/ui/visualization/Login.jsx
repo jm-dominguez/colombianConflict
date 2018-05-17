@@ -9,21 +9,20 @@ export default class Login extends React.Component {
         this.state = {
             email: "",
             password: "",
-            name: ""
+            state: "notLoged"
         }
 
         this.handleEmail = this.handleEmail.bind(this);
         this.handlePassword = this.handlePassword.bind(this);
         this.handleLogin = this.handleLogin.bind(this);
+        this.renderForm = this.renderForm.bind(this);
     }
 
     handleEmail(e) {
-        console.log(e.target.value);
         this.setState({ email: e.target.value });
     }
 
     handlePassword(e) {
-        console.log(e.target.value);
         this.setState({ password: e.target.value });
     }
 
@@ -36,17 +35,26 @@ export default class Login extends React.Component {
             alert("Por favor ingresa la contraseña");
         }
         else {
-            alert("Logeadito");
+            Meteor.loginWithPassword(this.state.email, this.state.password, (err) => {
+                if (err) {
+                    alert(err);
+                }
+                else {
+                    alert("Ingresado correctamente");
+                    this.setState({ state : "Loged"})
+                }
+            });
         }
     }
 
     handleCreateAccount(e) {
         e.preventDefault();
+
     }
 
-    render() {
-        return (
-            <div>
+    renderForm() {
+        if (this.state.state === "notLoged") {
+            return (
                 <form>
                     <div className="form-group">
                         <label htmlFor="email">Correo:</label>
@@ -58,10 +66,24 @@ export default class Login extends React.Component {
                     </div>
                     <br />
                     <button type="submit" className="btn btn-primary" onClick={this.handleLogin}>Ingresar</button>
-                    <br />
-                    <h4>¿No tienes cuenta? Crea una </h4>
-                    <button type="submit" className="btn btn-primary" onClick={this.handleCreateAccount}>Crear cuenta</button>
                 </form>
+            )
+        }
+        else if (this.state.state === "Loged"){
+            return (
+                <div>
+                    <h2>Hola <strong> {Meteor.user().profile.name   }</strong></h2>
+                </div>
+            )
+        }
+    }
+
+    render() {
+        return (
+            <div>
+                {
+                    this.renderForm()
+                }
             </div>
         )
     }
