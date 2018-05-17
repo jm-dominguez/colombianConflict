@@ -89,6 +89,8 @@ export default class Scrollytelling extends React.Component {
     componentDidMount() {
         window.addEventListener('scroll', this.handleScroll, { passive: true });
         let step0 = function () {
+            d3.selectAll(".step").style("opacity", 0);
+            d3.select("#inicio").style("opacity", 1);
             let t = d3.transition().duration(1000);
             d3.select("svg").remove();
             d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
@@ -257,7 +259,11 @@ export default class Scrollytelling extends React.Component {
     active(i) {
         let functions = [];
         let step0 = function () {
-            let t = d3.transition().duration(2000);
+            let t = d3.transition("image").duration(1000);
+            let t2 = d3.transition("nexttext").duration(1000);
+            let t3 = d3.transition("thistext").duration(1000);
+            d3.select("#antecedentes").transition(t2).style("opacity", 0);
+            d3.select("#inicio").transition(t3).style("opacity", 1);
             d3.select("svg").remove();
             d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
             let g = d3.select("svg");
@@ -275,7 +281,14 @@ export default class Scrollytelling extends React.Component {
         functions.push(step0);
 
         let step1 = function () {
-            let t = d3.transition().duration(2000);
+            let t = d3.transition("image").duration(1000);
+            let t2 = d3.transition("prevStep").duration(1000);
+            let t3 = d3.transition("thisStep").duration(1000);
+            let t4 = d3.transition("nextStep").duration(1000);
+
+            d3.select("#inicio").transition(t2).style("opacity", 0);
+            d3.select("#antecedentes").transition(t3).style("opacity", 1);
+            d3.select("#farc").transition(t4).style("opacity", 0);
             d3.select("svg").remove();
             d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
             let g = d3.select("svg");
@@ -293,7 +306,13 @@ export default class Scrollytelling extends React.Component {
         functions.push(step1);
 
         let step2 = function () {
-            let t = d3.transition().duration(2000);
+            let t = d3.transition("image").duration(1000);
+            let t2 = d3.transition("prevStep").duration(1000);
+            let t3 = d3.transition("thisStep").duration(1000);
+            let t4 = d3.transition("nextStep").duration(1000);
+            d3.select("#antecedentes").transition(t2).style("opacity", 0);
+            d3.select("#farc").transition(t3).style("opacity", 1);
+            d3.select("#tweets-farc").transition(t4).style("opacity", 0);
             d3.select("svg").remove();
             d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
             let g = d3.select("svg");
@@ -312,7 +331,13 @@ export default class Scrollytelling extends React.Component {
 
         let step3 = function () {
 
-            let t = d3.transition().duration(2000);
+            let t = d3.transition("image").duration(0);
+            let t2 = d3.transition("prevStep").duration(1000);
+            let t3 = d3.transition("thisStep").duration(1000);
+            let t4 = d3.transition("nextStep").duration(1000);
+            d3.select("#farc").transition(t2).style("opacity", 0);
+            d3.select("#tweets-farc").transition(t3).style("opacity", 1);
+            d3.select("#paz").transition(t4).style("opacity", 0);
             d3.select("svg").remove();
             d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
             let g = d3.select("svg");
@@ -331,7 +356,11 @@ export default class Scrollytelling extends React.Component {
         functions.push(step3);
 
         let step4 = function() {
-            let t = d3.transition().duration(2000);
+            let t = d3.transition("image").duration(1000);
+            let t3 = d3.transition("thisStep").duration(1000);
+            let t4 = d3.transition("nextStep").duration(1000);
+            d3.select("#paz").transition(t3).style("opacity", 1);
+            d3.select("#end").transition(t4).style("opacity", 0);
             d3.select("svg").remove();
             d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
             let g = d3.select("svg");
@@ -349,7 +378,7 @@ export default class Scrollytelling extends React.Component {
         functions.push(step4);
         
         let step5 = function () {
-            let t = d3.transition().duration(2000);
+            let t = d3.transition("image").duration(1000);
             d3.select("svg").remove();
             d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
             let g = d3.select("svg");
@@ -520,9 +549,11 @@ export default class Scrollytelling extends React.Component {
                     <div className="row">
                         <div className="col-sm-12">
                             <div id="sections">
-                                <section className="step">
+                                <section className="step" id="inicio">
                                     <br />
+                                    <strong>
                                     <h1>Conflicto Armado en Colombia</h1>
+                                    </strong>
                                     <p>
                                     Es un conflicto violento que se desarrolla desde la decada de los sesenta hasta la actualidad.
                                     A lo largo de su historia ha tenido diversos actores, entre los cuales destacan: Las FARC, el ELN,
@@ -530,7 +561,7 @@ export default class Scrollytelling extends React.Component {
                                 </p>
                                     <br />
                                 </section>
-                                <section className="step">
+                                <section className="step" id="antecedentes">
                                     <h1> Antecedentes </h1>
                                     <p>
 
@@ -540,7 +571,7 @@ export default class Scrollytelling extends React.Component {
 -                                   no tradicionales, lo cual dió lugar a los grupos insurgentes conocidos como bandoleros.
                                 </p>
                                 </section>
-                                <section className="step">
+                                <section className="step" id="farc">
                                     <h1> Fundación FARC </h1>
                                     <p>
                                         Las Fuerzas Armadas Revolucionarias de Colombia (FARC), fueron fundadas en el año 1964 después un ataque realizado por el gobierno colombiano,
@@ -548,13 +579,13 @@ export default class Scrollytelling extends React.Component {
                                         no obstante, hacia los años 80, el grupo plantea una estrategia de duplicamiento de frentes con el fin de reclutar un mayor número de integrantes.
                                 </p>
                                 </section>
-                                <section className="step">
+                                <section className="step" id="tweets-farc">
                                     <h1> Algunos Tweets sobre FARC </h1>
                                     <div className="container">
                                         {this.renderTweets()}
                                     </div>
                                 </section>
-                                <section className="step">
+                                <section className="step" id="paz">
                                     <h1> Tratado de Paz </h1>
 
                                     <p>
@@ -564,7 +595,10 @@ export default class Scrollytelling extends React.Component {
                                         de desarme y posteriormente, la reintegración a la vida civil.
                                 </p>
                                 </section>
-                                <section className="step">
+                                <section className="step" id="end">
+                                    <strong>
+                                        <h1> Thank You For your attention </h1>
+                                    </strong>
                                 </section>
                             </div>
 
