@@ -290,6 +290,26 @@ export default class Scrollytelling extends React.Component {
         functions.push(step2);
 
         let step3 = function () {
+
+            let t = d3.transition().duration(2000);
+            d3.select("svg").remove();
+            d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
+            let g = d3.select("svg");
+            g.append("svg:image")
+                .attr('xlink:href', 'http://cr00.epimg.net/radio/imagenes/2016/08/24/nacional/1472074857_412046_1472075009_noticia_normal.jpg')
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .style("opacity", 0)
+                .transition(t)
+                .style("opacity", 1);
+            
+        }
+
+        functions.push(step3);
+
+        let step4 = function() {
             let t = d3.transition().duration(2000);
             d3.select("svg").remove();
             d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
@@ -305,9 +325,9 @@ export default class Scrollytelling extends React.Component {
                 .style("opacity", 1);
         }
 
-        functions.push(step3);
+        functions.push(step4);
         
-        let step4 = function () {
+        let step5 = function () {
             let t = d3.transition().duration(2000);
             d3.select("svg").remove();
             d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
@@ -323,7 +343,7 @@ export default class Scrollytelling extends React.Component {
                 .style("opacity", 1);
         }
 
-        functions.push(step4);
+        functions.push(step5);
         functions[i]();
     }
 
@@ -338,13 +358,9 @@ export default class Scrollytelling extends React.Component {
                                     <br />
                                     <h1>Conflicto Armado en Colombia</h1>
                                     <p>
-                                        El conflicto armado interno en Colombia es una guerra asimétrica de baja intensidad que se desarrolla
-                                        en Colombia desde la década de 1960 hasta la actualidad. Los principales actores involucrados han sido
-                                        en un comienzo el Estado colombiano y las guerrillas de extrema izquierda, sumándose décadas después los
-                                        grupos paramilitares de extrema derecha, los carteles de la droga y las bandas criminales. Ha pasado por
-                                        varias etapas de recrudecimiento, en especial desde los años 80´s, cuando algunos de los actores del conflicto
-                                        arreciaron en sus ataques afectando sobre todo a la población civil, gracias al financiamiento de las
-                                        actividades derivadas del narcotráfico.
+                                    Es un conflicto violento que se desarrolla desde la decada de los sesenta hasta la actualidad.
+                                    A lo largo de su historia ha tenido diversos actores, entre los cuales destacan: Las FARC, el ELN,
+                                    los grupos paramilitares, el gobierno de Colombia y los carteles de la droga.
                                 </p>
                                     <br />
                                 </section>
@@ -352,9 +368,10 @@ export default class Scrollytelling extends React.Component {
                                     <h1> Antecedentes </h1>
                                     <p>
 
-                                        Desde la independencia de Colombia en 1819 y la desintegración de la república creada por Bolívar en 1830, el país no ha estado
-                                        ajeno a la violencia bipartidista, hecho que fue evidente en las numerosas guerras civiles que se desarrollaron durante el siglo XIX
-                                        culminando en la Guerra de los Mil Días (1899–1902).
+                                    A lo largo de su historia, Colombia se ha encontrado constatemente en conflictos políticos. El 9 de Abril de 1948
+-                                   con el asesinato de Jorge Eiécer Gaitán, daba inicio el periodo conocido como "La Violencia". Dicho conflicto terminaría
+-                                   en el año 1956 con la creación del frente nacional. No obstante, dicho acuerdo generó descontento en los partidos políticos
+-                                   no tradicionales, lo cual dió lugar a los grupos insurgentes conocidos como bandoleros.
                                 </p>
                                 </section>
                                 <section className="step">
@@ -364,6 +381,8 @@ export default class Scrollytelling extends React.Component {
                                         con el fin de reafirmar las políticas establecidas en el frente nacional. Durante sus primeros 10 a 20 años, el crecimiento del grupo fue lento,
                                         no obstante, hacia los años 80, el grupo plantea una estrategia de duplicamiento de frentes con el fin de reclutar un mayor número de integrantes.
                                 </p>
+                                </section>
+                                <section className="step">
                                     <h1> Algunos Tweets sobre FARC </h1>
                                     <div className="container">
                                         {this.renderTweets()}
