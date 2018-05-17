@@ -1,8 +1,6 @@
 import React from "react";
 import * as d3 from "d3";
 import Tweet from "../components/tweets.jsx";
-import Login from "./Login.jsx";
-import SignUp from "./SignUp.jsx";
 
 import "./scroll.css";
 
@@ -400,6 +398,7 @@ export default class Scrollytelling extends React.Component {
                     }
                     else {
                         alert("Cuenta creada exitosamente");
+                        this.setState({ status: "Loged" })
                     }
                 });
             }
