@@ -1,10 +1,12 @@
 import React from "react";
 import * as d3 from "d3";
 import Tweet from "../components/tweets.jsx";
+import { Comments } from "../../api/Comments.js";
+import { withTracker } from "meteor/react-meteor-data";
 
 import "./scroll.css";
 
-export default class Scrollytelling extends React.Component {
+class Scrollytelling extends React.Component {
 
     constructor(props) {
         super(props);
@@ -13,6 +15,7 @@ export default class Scrollytelling extends React.Component {
         this.handleScroll = this.handleScroll.bind(this);
         this.active = this.active.bind(this);
         this.renderTweets = this.renderTweets.bind(this);
+
         this.handleSignUpButton = this.handleSignUpButton.bind(this);
         this.handleLoginButton = this.handleLoginButton.bind(this);
         this.renderButtons = this.renderButtons.bind(this);
@@ -22,8 +25,21 @@ export default class Scrollytelling extends React.Component {
         this.handleConfirmPassword = this.handleConfirmPassword.bind(this);
         this.handleCreateAccount = this.handleCreateAccount.bind(this);
         this.handleLogin = this.handleLogin.bind(this);
+        this.handleLogOut = this.handleLogOut.bind(this);
+        this.handleChangePregunta1 = this.handleChangePregunta1.bind(this);
+        this.handleChangePregunta2 = this.handleChangePregunta2.bind(this);
+        this.handleChangePregunta3 = this.handleChangePregunta3.bind(this);
+        this.handleAnswerQ1 = this.handleAnswerQ1.bind(this);
+        this.handleAnswerQ2 = this.handleAnswerQ2.bind(this);
+        this.handleAnswerQ3 = this.handleAnswerQ3.bind(this);
+        this.handleComment = this.handleComment.bind(this);
+        this.handleCommentChange = this.handleCommentChange.bind(this);
         this.state = {
-            status: "Login"
+            status: "Login",
+            pregunta1: "",
+            pregunta2: "",
+            pregunta3: "",
+            comment: ""
         }
     }
 
@@ -37,6 +53,48 @@ export default class Scrollytelling extends React.Component {
         e.preventDefault();
         this.setState({ status: "Login" });
         console.log(this.state);
+    }
+
+    handleChangePregunta1(e) {
+        this.setState({ pregunta1: e.target.value });
+    }
+
+    handleChangePregunta2(e) {
+        this.setState({ pregunta2: e.target.value });
+    }
+
+    handleChangePregunta3(e) {
+        this.setState({ pregunta3: e.target.value });
+    }
+
+    handleAnswerQ1(e) {
+        e.preventDefault();
+        if (this.state.pregunta1 === "") {
+            alert("Por favor selecciona una respuesta");
+        }
+        else {
+            alert("Voto registrado")
+        }
+    }
+
+    handleAnswerQ2(e) {
+        e.preventDefault();
+        if (this.state.pregunta2 === "") {
+            alert("Por favor selecciona una respuesta");
+        }
+        else {
+            alert("Voto registrado")
+        }
+    }
+
+    handleAnswerQ3(e) {
+        e.preventDefault();
+        if (this.state.pregunta3 === "") {
+            alert("Por favor selecciona una respuesta");
+        }
+        else {
+            alert("Voto registrado")
+        }
     }
 
     componentWillMount() {
@@ -87,6 +145,13 @@ export default class Scrollytelling extends React.Component {
     }
 
     componentDidMount() {
+
+        if (Meteor.userId() !== null) {
+            this.setState({
+                status: "Loged"
+            })
+        }
+
         window.addEventListener('scroll', this.handleScroll, { passive: true });
         let step0 = function () {
             d3.selectAll(".step").style("opacity", 0);
@@ -107,6 +172,13 @@ export default class Scrollytelling extends React.Component {
         }
 
         step0();
+
+        Meteor.call("poll.findByQuestion", 1, (err, result) => {
+            if (err) {
+                throw err;
+            }
+        });
+
         var myData = [100, 40, 60],
             myData2 = [100, 40, 60],
             myData3 = [100, 49, 51],
@@ -280,16 +352,16 @@ export default class Scrollytelling extends React.Component {
 
         functions.push(step0);
 
-        let donutStep = function (){
+        let donutStep = function () {
             let muertes = [{
                 "estado": "Combatiente",
                 "muertos": "40787"
             },
-           {
-               "estado": "Civil",
-               "muertos": "177307"
-           }];
-            
+            {
+                "estado": "Civil",
+                "muertos": "177307"
+            }];
+
             let t = d3.transition("image").duration(1000);
             let t2 = d3.transition("prevStep").duration(1000);
             let t3 = d3.transition("thisStep").duration(1000);
@@ -303,68 +375,68 @@ export default class Scrollytelling extends React.Component {
             let radius = 200;
             let color = d3.scaleOrdinal().range(["#ff8c00", "#6b486b"]);
             let arc = d3.arc()
-                      .outerRadius(radius - 10)
-                      .innerRadius(radius - 70);
+                .outerRadius(radius - 10)
+                .innerRadius(radius - 70);
             let pie = d3.pie()
-                      .sort(null)
-                      .value(function(d) { return d.muertos; });
+                .sort(null)
+                .value(function (d) { return d.muertos; });
             var svg = d3.select("#vis").append("svg")
-                      .attr("width", 600)
-                      .attr("height", 600)
-                      .append("g")
-                      .attr("transform", "translate(" + 600 / 2 + "," + 600 / 2 + ")");
-            
-            svg.style("opacity", 0).transition(t).style("opacity",1);
+                .attr("width", 600)
+                .attr("height", 600)
+                .append("g")
+                .attr("transform", "translate(" + 600 / 2 + "," + 600 / 2 + ")");
 
-            muertes.forEach(function(d) {
-                        d.muertos = +d.muertos;
-                    });
-            
+            svg.style("opacity", 0).transition(t).style("opacity", 1);
+
+            muertes.forEach(function (d) {
+                d.muertos = +d.muertos;
+            });
+
             var g = svg.selectAll(".arc")
-                    .data(pie(muertes))
-                    .enter().append("g")
-                    .attr("class", "arc")
-                    .on("mouseover", function(d) {
-                        let g = d3.select(this)
-                          .style("cursor", "pointer")
-                          .style("opacity", 0.7)
-                          .append("g")
-                          .attr("class", "text-group");
-                   
-                        g.append("text")
-                          .attr("class", "name-text")
-                          .text(`${d.data.estado}`)
-                          .attr('text-anchor', 'middle')
-                          .attr('dy', '-1.2em');
-                    
-                        g.append("text")
-                          .attr("class", "value-text")
-                          .text(`${d.data.muertos}`)
-                          .attr('text-anchor', 'middle')
-                          .attr('dy', '.6em');
-                      })
-                    .on("mouseout", function(d) {
-                        d3.select(this)
-                          .style("cursor", "none")  
-                          .style("opacity", 1)
-                          .select(".text-group").remove();
-                      });
+                .data(pie(muertes))
+                .enter().append("g")
+                .attr("class", "arc")
+                .on("mouseover", function (d) {
+                    let g = d3.select(this)
+                        .style("cursor", "pointer")
+                        .style("opacity", 0.7)
+                        .append("g")
+                        .attr("class", "text-group");
+
+                    g.append("text")
+                        .attr("class", "name-text")
+                        .text(`${d.data.estado}`)
+                        .attr('text-anchor', 'middle')
+                        .attr('dy', '-1.2em');
+
+                    g.append("text")
+                        .attr("class", "value-text")
+                        .text(`${d.data.muertos}`)
+                        .attr('text-anchor', 'middle')
+                        .attr('dy', '.6em');
+                })
+                .on("mouseout", function (d) {
+                    d3.select(this)
+                        .style("cursor", "none")
+                        .style("opacity", 1)
+                        .select(".text-group").remove();
+                });
 
             let tc = d3.transition("color").duration("1000");
 
             g.append("path")
-                    .attr("d", arc)
-                    .transition(tc)
-                    .style("fill", function(d) { return color(d.data.estado); });
+                .attr("d", arc)
+                .transition(tc)
+                .style("fill", function (d) { return color(d.data.estado); });
             g.append("text")
-                    .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
-                    .attr("dy", ".35em")
-                    .text(function(d) { return d.data.estado; });
-            
+                .attr("transform", function (d) { return "translate(" + arc.centroid(d) + ")"; })
+                .attr("dy", ".35em")
+                .text(function (d) { return d.data.estado; });
+
             function type(d) {
                 d.muertos = +d.muertos;
                 return d;
-              }
+            }
         }
 
         functions.push(donutStep);
@@ -394,7 +466,7 @@ export default class Scrollytelling extends React.Component {
 
         functions.push(step1);
 
-        let stepELN = function(){
+        let stepELN = function () {
             let t = d3.transition("image").duration(1000);
             let t2 = d3.transition("prevStep").duration(1000);
             let t3 = d3.transition("thisStep").duration(1000);
@@ -420,7 +492,7 @@ export default class Scrollytelling extends React.Component {
 
         functions.push(stepELN);
 
-        let stepM19 = function(){
+        let stepM19 = function () {
             let t = d3.transition("image").duration(1000);
             let t2 = d3.transition("prevStep").duration(1000);
             let t3 = d3.transition("thisStep").duration(1000);
@@ -491,7 +563,7 @@ export default class Scrollytelling extends React.Component {
                 .style("opacity", 0)
                 .transition(t)
                 .style("opacity", 1);
-            
+
         }
 
         functions.push(step3);
@@ -515,22 +587,22 @@ export default class Scrollytelling extends React.Component {
                 .style("opacity", 0)
                 .transition(t)
                 .style("opacity", 1);
-            
+
         }
 
         functions.push(stepAUC);
 
-        let stepParticipacion = function(){
+        let stepParticipacion = function () {
             let datos = [{
                 actor: "Grupos Paramilitares",
                 valor: 0.384
             },
             {
                 actor: "Guerrillas",
-                valor :0.169
+                valor: 0.169
             },
             {
-                actor:"Fuerza Pública",
+                actor: "Fuerza Pública",
                 valor: 0.104
             }, {
                 actor: "Grupo no Identificado",
@@ -547,72 +619,72 @@ export default class Scrollytelling extends React.Component {
             d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
 
             var svg = d3.select("svg"),
-            margin = {top: 20, right: 20, bottom: 30, left: 40},
-            width = +svg.attr("width") - margin.left - margin.right,
-            height = +svg.attr("height") - margin.top - margin.bottom;
+                margin = { top: 20, right: 20, bottom: 30, left: 40 },
+                width = +svg.attr("width") - margin.left - margin.right,
+                height = +svg.attr("height") - margin.top - margin.bottom;
 
             var x = d3.scaleBand().rangeRound([0, width]).padding(0.1),
-            y = d3.scaleLinear().rangeRound([height, 0]);
+                y = d3.scaleLinear().rangeRound([height, 0]);
 
             var g = svg.append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
             d3.select("svg").style("opacity", 0).transition(t).style("opacity", 1);
 
-            datos.forEach(function(d){
+            datos.forEach(function (d) {
                 d.valor = +d.valor;
             });
 
-            x.domain(datos.map(function(d) { return d.actor; }));
-            y.domain([0, d3.max(datos, function(d) { return d.valor; })]);
+            x.domain(datos.map(function (d) { return d.actor; }));
+            y.domain([0, d3.max(datos, function (d) { return d.valor; })]);
 
             g.append("g")
-            .attr("class", "axis axis--x")
-            .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(x));
+                .attr("class", "axis axis--x")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x));
 
             g.append("g")
-            .attr("class", "axis axis--y")
-            .call(d3.axisLeft(y).ticks(10, "%"))
-            .append("text")
-            .attr("transform", "rotate(-90)")
-            .attr("y", 6)
-            .attr("dy", "0.71em")
-            .attr("text-anchor", "end")
-            .text("Asesinatos");
+                .attr("class", "axis axis--y")
+                .call(d3.axisLeft(y).ticks(10, "%"))
+                .append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 6)
+                .attr("dy", "0.71em")
+                .attr("text-anchor", "end")
+                .text("Asesinatos");
 
             let tb = d3.transition("bar").duration(1000);
 
             let bars = g.selectAll(".bar")
-            .data(datos)
-            .enter().append("rect")
-            .attr("class", "bar")
-            .attr("x", function(d) { return x(d.actor); })
-            .attr("y", function(d) { return y(d.valor); })
-            .style("fill", "#008080")
-            .attr("width", x.bandwidth());
+                .data(datos)
+                .enter().append("rect")
+                .attr("class", "bar")
+                .attr("x", function (d) { return x(d.actor); })
+                .attr("y", function (d) { return y(d.valor); })
+                .style("fill", "#008080")
+                .attr("width", x.bandwidth());
 
             bars
-            .transition(tb)
-            .attr("height", function(d) { return height - y(d.valor); });
+                .transition(tb)
+                .attr("height", function (d) { return height - y(d.valor); });
             bars
-            .on("mouseover", function(d) {
-                let g = d3.select(this)
-                  .style("cursor", "pointer")
-                  .style("opacity", 0.7)
-                  .append("g")
-                  .attr("class", "text-group");
-              })
-            .on("mouseout", function(d) {
-                d3.select(this)
-                  .style("cursor", "none")  
-                  .style("opacity", 1)
-                  .select(".text-group").remove();
-              });
+                .on("mouseover", function (d) {
+                    let g = d3.select(this)
+                        .style("cursor", "pointer")
+                        .style("opacity", 0.7)
+                        .append("g")
+                        .attr("class", "text-group");
+                })
+                .on("mouseout", function (d) {
+                    d3.select(this)
+                        .style("cursor", "none")
+                        .style("opacity", 1)
+                        .select(".text-group").remove();
+                });
         }
 
         functions.push(stepParticipacion);
-        let step4 = function() {
+        let step4 = function () {
             let t = d3.transition("image").duration(1000);
             let t2 = d3.transition("prevStep").duration(1000);
             let t3 = d3.transition("thisStep").duration(1000);
@@ -636,7 +708,7 @@ export default class Scrollytelling extends React.Component {
         }
 
         functions.push(step4);
-        
+
         let step5 = function () {
             let t = d3.transition("image").duration(1000);
             let t2 = d3.transition("prevStep").duration(1000);
@@ -743,6 +815,46 @@ export default class Scrollytelling extends React.Component {
         }
     }
 
+    handleLogOut(event) {
+        event.preventDefault();
+        try {
+
+            Meteor.logout((err) => {
+                if (err) {
+                    throw err;
+                }
+                else {
+                    this.setState({
+                        status: "Login"
+                    })
+                }
+            });
+        }
+        catch (e) {
+            alert("Hubo un error cerrando sesión, por favor intente de nuevo");
+        }
+    }
+
+    handleComment() {
+        if (Meteor.user() === null) {
+            alert("Necesitar iniciar sesión para poder añadir un comentario ");
+        }
+        else if (this.state.comment === "") {
+            alert("El comentario no puede estar vacio")
+        }
+        else {
+            Meteor.call("comments.add", this.state.comment, Meteor.user().emails[0].address, Meteor.user().profile.name);
+            alert("Comment añadido!");
+
+            document.getElementById("commentTextBox").value = ""
+            this.state.comment = ""
+        }
+    }
+
+    handleCommentChange(e) {
+        this.setState({ comment: e.target.value });
+    }
+
     renderButtons() {
         if (this.state.status === "Login") {
             return (
@@ -798,14 +910,32 @@ export default class Scrollytelling extends React.Component {
             )
         }
         else if (this.state.status === "Loged") {
-            return (
-                <div>
-                    <h2>Hola <strong> {Meteor.user().profile.name}</strong></h2>
-                </div>
-            )
+            if (Meteor.user() !== undefined) {
+                return (
+                    <div>
+                        <h2>Hola <strong> {Meteor.user().profile.name}</strong></h2>
+                        <br />
+                        <button type="submit" className="btn btn-primary" onClick={this.handleLogOut}>Cerrar sesión</button>
+                    </div>
+                )
+            }
         }
     }
 
+    formatDate(date) {
+        var monthNames = [
+            "Enero", "Febrero", "Marzo",
+            "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre",
+            "Noviembre", "Diciembre"
+        ];
+
+        var day = date.getDate();
+        var monthIndex = date.getMonth();
+        var year = date.getFullYear();
+
+        return "Realizo un comentario el " + day + " de " + monthNames[monthIndex] + " del " + year
+    }
     render() {
         return (
             <div className="container-fluid">
@@ -816,31 +946,31 @@ export default class Scrollytelling extends React.Component {
                                 <section className="step" id="inicio">
                                     <br />
                                     <strong>
-                                    <h1>Conflicto Armado en Colombia</h1>
+                                        <h1>Conflicto Armado en Colombia</h1>
                                     </strong>
                                     <p>
-                                    Es un conflicto violento que se desarrolla desde la decada de los sesenta hasta la actualidad.
-                                    A lo largo de su historia ha tenido diversos actores, entre los cuales destacan: Las FARC, el ELN,
-                                    los grupos paramilitares, el gobierno de Colombia y los carteles de la droga.
+                                        Es un conflicto violento que se desarrolla desde la decada de los sesenta hasta la actualidad.
+                                        A lo largo de su historia ha tenido diversos actores, entre los cuales destacan: Las FARC, el ELN,
+                                        los grupos paramilitares, el gobierno de Colombia y los carteles de la droga.
                                 </p>
                                     <br />
                                 </section>
                                 <section className="step" id="datos-generales">
                                     <h1> Daño Colateral </h1>
                                     <p>
-                                    Según estadísticas del Centro Nacional de Memoria Histórica, en Colombia entre los años de 1958 y 2012, 
-                                    el conflicto armado ha causado la muerte de 218.094 personas. De estos cerca del 19%(40.787 muertos) fueron combatientes. 
-                                    El 81% restante (177.307 muertos) fueron civiles. 
+                                        Según estadísticas del Centro Nacional de Memoria Histórica, en Colombia entre los años de 1958 y 2012,
+                                        el conflicto armado ha causado la muerte de 218.094 personas. De estos cerca del 19%(40.787 muertos) fueron combatientes.
+                                        El 81% restante (177.307 muertos) fueron civiles.
                                     </p>
                                 </section>
                                 <section className="step" id="antecedentes">
                                     <h1> Antecedentes </h1>
                                     <p>
 
-                                    A lo largo de su historia, Colombia se ha encontrado constatemente en conflictos políticos. El 9 de Abril de 1948
--                                   con el asesinato de Jorge Eiécer Gaitán, daba inicio el periodo conocido como "La Violencia". Dicho conflicto terminaría
--                                   en el año 1956 con la creación del frente nacional. No obstante, dicho acuerdo generó descontento en los partidos políticos
--                                   no tradicionales, lo cual dió lugar a los grupos insurgentes conocidos como bandoleros.
+                                        A lo largo de su historia, Colombia se ha encontrado constatemente en conflictos políticos. El 9 de Abril de 1948
+    -                                   con el asesinato de Jorge Eiécer Gaitán, daba inicio el periodo conocido como "La Violencia". Dicho conflicto terminaría
+    -                                   en el año 1956 con la creación del frente nacional. No obstante, dicho acuerdo generó descontento en los partidos políticos
+    -                                   no tradicionales, lo cual dió lugar a los grupos insurgentes conocidos como bandoleros.
                                     </p>
                                 </section>
                                 <section className="step" id="ELN">
@@ -884,9 +1014,9 @@ export default class Scrollytelling extends React.Component {
                                 <section className="step" id="participacion">
                                     <h1> Participación </h1>
                                     <p>
-                                    Desde 1895 a 2012 fueron asesinadas cerca de 150.000 personas. De estas 23.161 (10.62) han sido asesinadas selectivamente. 
-                                    De estos 8.903 (38.4%) asesinatos han sido cometidos por grupos paramilitares, 3.899 (16.9%) por guerrillas, 
-                                    2.399 (10.4%) por fuerza pública y 6.406(27.7%) por grupos armados no identificados
+                                        Desde 1895 a 2012 fueron asesinadas cerca de 150.000 personas. De estas 23.161 (10.62) han sido asesinadas selectivamente.
+                                        De estos 8.903 (38.4%) asesinatos han sido cometidos por grupos paramilitares, 3.899 (16.9%) por guerrillas,
+                                        2.399 (10.4%) por fuerza pública y 6.406(27.7%) por grupos armados no identificados
 
                                     </p>
                                 </section>
@@ -925,7 +1055,7 @@ export default class Scrollytelling extends React.Component {
                                 <div className="col-md-1"></div>
                                 <div className="col-md-5">
 
-                                    <div className="questions">
+                                    <div className="panel panel-white post panel-shadow questions">
                                         <fieldset className="form-group" onChange={this.handleChangePregunta1}>
                                             <legend>¿Estás de acuerdo con la realización del acuerdo de paz con las FARC?</legend>
                                             <div className="form-check">
@@ -939,6 +1069,7 @@ export default class Scrollytelling extends React.Component {
                                                     No</label>
                                             </div>
                                         </fieldset>
+                                        <button type="submit" className="btn btn-primary" onClick={this.handleAnswerQ1}>Aceptar</button>
                                     </div>
                                 </div>
                                 <div className="col-md-5">
@@ -954,7 +1085,7 @@ export default class Scrollytelling extends React.Component {
                             <div className="row">
                                 <div className="col-md-1"></div>
                                 <div className="col-md-5">
-                                    <div className="questions">
+                                    <div className="panel panel-white post panel-shadow questions">
                                         <fieldset className="form-group" onChange={this.handleChangePregunta2}>
                                             <legend>¿Estás de acuerdo con la participación de las FARC en la politica colombiana?</legend>
                                             <div className="form-check">
@@ -968,6 +1099,7 @@ export default class Scrollytelling extends React.Component {
                                                     No</label>
                                             </div>
                                         </fieldset>
+                                        <button type="submit" className="btn btn-primary" onClick={this.handleAnswerQ2}>Aceptar</button>
                                     </div>
                                 </div>
                                 <div className="col-md-5">
@@ -982,7 +1114,7 @@ export default class Scrollytelling extends React.Component {
                             <div className="row">
                                 <div className="col-md-1"></div>
                                 <div className="col-md-5">
-                                    <div className="questions">
+                                    <div className="panel panel-white post panel-shadow questions">
                                         <fieldset className="form-group" onChange={this.handleChangePregunta3}>
                                             <legend>¿Estás de acuerdo con la realización de un acuerdo de paz con el ELN?</legend>
                                             <div className="form-check">
@@ -996,6 +1128,7 @@ export default class Scrollytelling extends React.Component {
                                                     No</label>
                                             </div>
                                         </fieldset>
+                                        <button type="submit" className="btn btn-primary" onClick={this.handleAnswerQ3}>Aceptar</button>
                                     </div>
                                 </div>
                                 <div className="col-md-5">
@@ -1006,13 +1139,67 @@ export default class Scrollytelling extends React.Component {
                                     </div>
                                 </div>
                             </div>
+                            {/** Section of comments**/}
+                            <div className="newComment">
+                                <h2>Expresa tu postura acerca del conflicto armado en Colombia</h2>
+                                <form>
+                                    <div className="form-group">
+                                        <label htmlFor="usr">Deja tu postura aquí:</label>
+                                        <input type="text" className="form-control panel panel-white post panel-shadow" id="commentTextBox" onChange={this.handleCommentChange} />
+                                        <br />
+                                        <button type="button" className="btn btn-primary" id="buttonComment" onClick={this.handleComment}>Send comment</button>
+                                    </div>
+                                </form>
 
+                            </div>
+                            <div className="comments">
+                                <div className="row">
+                                    <h2>Mira la postura de los demás</h2>
+                                    <div className="col-sm-8">
+                                        {
+                                            this.props.comments.map((c, i) => (
+                                                <div key={i + "a"} className="panel panel-white post panel-shadow">
+                                                    <div key={i + "b"} className="post-heading">
+                                                        <div key={i + "c"} className="pull-left image">
+                                                            <img key={i + "d"} src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNLzZszQbQf6jkknIGI8A3rj-0BoEngyi9156njfrCjPED9_b2vw" className="img-circle avatar" alt="user profile image" />
+                                                        </div>
+                                                        <div key={i + "e"} className="pull-left meta">
+                                                            <div key={i + "f"} className="title h5">
+                                                                <a key={i + "g"} href="#"><b>{c.name} </b></a>
+                                                            </div>
+
+
+                                                            <h6 key={i + "h"} className="text-muted time">{
+                                                                this.formatDate(c.dateCreated)
+                                                            }</h6>
+                                                        </div>
+                                                    </div>
+                                                    <br />
+                                                    <br />
+                                                    <div key={i + "i"} className="post-description">
+                                                        <p key={i + "j"} >{c.comment}</p>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        }
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <br />
+                            <br />
                         </div>
-
                     </div>
-
                 </div>
             </div>
         );
     }
 }
+
+export default withTracker(() => {
+    Meteor.subscribe("comments");
+    return {
+        comments: Comments.find({}).fetch(),
+    }
+})(Scrollytelling);
