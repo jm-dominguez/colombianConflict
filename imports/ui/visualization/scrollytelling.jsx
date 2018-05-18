@@ -262,7 +262,7 @@ export default class Scrollytelling extends React.Component {
             let t = d3.transition("image").duration(1000);
             let t2 = d3.transition("nexttext").duration(1000);
             let t3 = d3.transition("thistext").duration(1000);
-            d3.select("#antecedentes").transition(t2).style("opacity", 0);
+            d3.select("#datos-generales").transition(t2).style("opacity", 0);
             d3.select("#inicio").transition(t3).style("opacity", 1);
             d3.select("svg").remove();
             d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
@@ -280,13 +280,102 @@ export default class Scrollytelling extends React.Component {
 
         functions.push(step0);
 
-        let step1 = function () {
+        let donutStep = function (){
+            let muertes = [{
+                "estado": "Combatiente",
+                "muertos": "40787"
+            },
+           {
+               "estado": "Civil",
+               "muertos": "177307"
+           }];
+            
             let t = d3.transition("image").duration(1000);
             let t2 = d3.transition("prevStep").duration(1000);
             let t3 = d3.transition("thisStep").duration(1000);
             let t4 = d3.transition("nextStep").duration(1000);
 
             d3.select("#inicio").transition(t2).style("opacity", 0);
+            d3.select("#datos-generales").transition(t3).style("opacity", 1);
+            d3.select("#antecedentes").transition(t4).style("opacity", 0);
+            d3.select("svg").remove();
+
+            let radius = 200;
+            let color = d3.scaleOrdinal().range(["#ff8c00", "#6b486b"]);
+            let arc = d3.arc()
+                      .outerRadius(radius - 10)
+                      .innerRadius(radius - 70);
+            let pie = d3.pie()
+                      .sort(null)
+                      .value(function(d) { return d.muertos; });
+            var svg = d3.select("#vis").append("svg")
+                      .attr("width", 600)
+                      .attr("height", 600)
+                      .append("g")
+                      .attr("transform", "translate(" + 600 / 2 + "," + 600 / 2 + ")");
+            
+            svg.style("opacity", 0).transition(t).style("opacity",1);
+
+            muertes.forEach(function(d) {
+                        d.muertos = +d.muertos;
+                    });
+            
+            var g = svg.selectAll(".arc")
+                    .data(pie(muertes))
+                    .enter().append("g")
+                    .attr("class", "arc")
+                    .on("mouseover", function(d) {
+                        let g = d3.select(this)
+                          .style("cursor", "pointer")
+                          .style("opacity", 0.7)
+                          .append("g")
+                          .attr("class", "text-group");
+                   
+                        g.append("text")
+                          .attr("class", "name-text")
+                          .text(`${d.data.estado}`)
+                          .attr('text-anchor', 'middle')
+                          .attr('dy', '-1.2em');
+                    
+                        g.append("text")
+                          .attr("class", "value-text")
+                          .text(`${d.data.muertos}`)
+                          .attr('text-anchor', 'middle')
+                          .attr('dy', '.6em');
+                      })
+                    .on("mouseout", function(d) {
+                        d3.select(this)
+                          .style("cursor", "none")  
+                          .style("opacity", 1)
+                          .select(".text-group").remove();
+                      });
+
+            let tc = d3.transition("color").duration("1000");
+
+            g.append("path")
+                    .attr("d", arc)
+                    .transition(tc)
+                    .style("fill", function(d) { return color(d.data.estado); });
+            g.append("text")
+                    .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+                    .attr("dy", ".35em")
+                    .text(function(d) { return d.data.estado; });
+            
+            function type(d) {
+                d.muertos = +d.muertos;
+                return d;
+              }
+        }
+
+        functions.push(donutStep);
+
+        let step1 = function () {
+            let t = d3.transition("image").duration(1000);
+            let t2 = d3.transition("prevStep").duration(1000);
+            let t3 = d3.transition("thisStep").duration(1000);
+            let t4 = d3.transition("nextStep").duration(1000);
+
+            d3.select("#datos-generales").transition(t2).style("opacity", 0);
             d3.select("#antecedentes").transition(t3).style("opacity", 1);
             d3.select("#farc").transition(t4).style("opacity", 0);
             d3.select("svg").remove();
@@ -305,7 +394,10 @@ export default class Scrollytelling extends React.Component {
 
         functions.push(step1);
 
+        
+
         let step2 = function () {
+
             let t = d3.transition("image").duration(1000);
             let t2 = d3.transition("prevStep").duration(1000);
             let t3 = d3.transition("thisStep").duration(1000);
@@ -379,6 +471,10 @@ export default class Scrollytelling extends React.Component {
         
         let step5 = function () {
             let t = d3.transition("image").duration(1000);
+            let t2 = d3.transition("prevStep").duration(1000);
+            let t3 = d3.transition("thisStep").duration(1000);
+            d3.select("#paz").style("opacity", 0);
+            d3.select("#end").style("opacity", 1);
             d3.select("svg").remove();
             d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
             let g = d3.select("svg");
@@ -561,6 +657,14 @@ export default class Scrollytelling extends React.Component {
                                 </p>
                                     <br />
                                 </section>
+                                <section className="step" id="datos-generales">
+                                    <h1> Daño Colateral </h1>
+                                    <p>
+                                    Según estadísticas del Centro Nacional de Memoria Histórica, en Colombia entre los años de 1958 y 2012, 
+                                    el conflicto armado ha causado la muerte de 218.094 personas. De estos cerca del 19%(40.787 muertos) fueron combatientes. 
+                                    El 81% restante (177.307 muertos) fueron civiles. 
+                                    </p>
+                                </section>
                                 <section className="step" id="antecedentes">
                                     <h1> Antecedentes </h1>
                                     <p>
@@ -597,7 +701,7 @@ export default class Scrollytelling extends React.Component {
                                 </section>
                                 <section className="step" id="end">
                                     <strong>
-                                        <h1> Thank You For your attention </h1>
+                                        <h1> Thank You </h1>
                                     </strong>
                                 </section>
                             </div>
