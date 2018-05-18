@@ -394,7 +394,56 @@ export default class Scrollytelling extends React.Component {
 
         functions.push(step1);
 
-        
+        let stepELN = function(){
+            let t = d3.transition("image").duration(1000);
+            let t2 = d3.transition("prevStep").duration(1000);
+            let t3 = d3.transition("thisStep").duration(1000);
+            let t4 = d3.transition("nextStep").duration(1000);
+
+            d3.select("#antecedentes").transition(t2).style("opacity", 0);
+            d3.select("#ELN").transition(t3).style("opacity", 1);
+            d3.select("#M19").transition(t4).style("opacity", 0);
+            d3.select("svg").remove();
+            d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
+            let g = d3.select("svg");
+            g.append("svg:image")
+                .attr('xlink:href', 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Flag_of_ELN.svg/1200px-Flag_of_ELN.svg.png')
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .style("opacity", 0)
+                .transition(t)
+                .style("opacity", 1);
+
+        }
+
+        functions.push(stepELN);
+
+        let stepM19 = function(){
+            let t = d3.transition("image").duration(1000);
+            let t2 = d3.transition("prevStep").duration(1000);
+            let t3 = d3.transition("thisStep").duration(1000);
+            let t4 = d3.transition("nextStep").duration(1000);
+
+            d3.select("#ELN").transition(t2).style("opacity", 0);
+            d3.select("#M19").transition(t3).style("opacity", 1);
+            d3.select("#farc").transition(t4).style("opacity", 0);
+            d3.select("svg").remove();
+            d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
+            let g = d3.select("svg");
+            g.append("svg:image")
+                .attr('xlink:href', 'https://www.elespectador.com/static_specials/10/procesodepazm19/image5.jpg')
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .style("opacity", 0)
+                .transition(t)
+                .style("opacity", 1);
+        }
+
+        functions.push(stepM19);
 
         let step2 = function () {
 
@@ -402,7 +451,7 @@ export default class Scrollytelling extends React.Component {
             let t2 = d3.transition("prevStep").duration(1000);
             let t3 = d3.transition("thisStep").duration(1000);
             let t4 = d3.transition("nextStep").duration(1000);
-            d3.select("#antecedentes").transition(t2).style("opacity", 0);
+            d3.select("#M19").transition(t2).style("opacity", 0);
             d3.select("#farc").transition(t3).style("opacity", 1);
             d3.select("#tweets-farc").transition(t4).style("opacity", 0);
             d3.select("svg").remove();
@@ -429,7 +478,7 @@ export default class Scrollytelling extends React.Component {
             let t4 = d3.transition("nextStep").duration(1000);
             d3.select("#farc").transition(t2).style("opacity", 0);
             d3.select("#tweets-farc").transition(t3).style("opacity", 1);
-            d3.select("#paz").transition(t4).style("opacity", 0);
+            d3.select("#auc").transition(t4).style("opacity", 0);
             d3.select("svg").remove();
             d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
             let g = d3.select("svg");
@@ -447,10 +496,129 @@ export default class Scrollytelling extends React.Component {
 
         functions.push(step3);
 
-        let step4 = function() {
-            let t = d3.transition("image").duration(1000);
+        let stepAUC = function () {
+
+            let t = d3.transition("image").duration(0);
             let t3 = d3.transition("thisStep").duration(1000);
             let t4 = d3.transition("nextStep").duration(1000);
+            d3.select("#auc").transition(t3).style("opacity", 1);
+            d3.select("#participacion").transition(t4).style("opacity", 0);
+            d3.select("svg").remove();
+            d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
+            let g = d3.select("svg");
+            g.append("svg:image")
+                .attr('xlink:href', 'http://www.eltiempo.com/contenido///politica/justicia/IMAGEN/IMAGEN-16448296-2.jpg')
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .style("opacity", 0)
+                .transition(t)
+                .style("opacity", 1);
+            
+        }
+
+        functions.push(stepAUC);
+
+        let stepParticipacion = function(){
+            let datos = [{
+                actor: "Grupos Paramilitares",
+                valor: 0.384
+            },
+            {
+                actor: "Guerrillas",
+                valor :0.169
+            },
+            {
+                actor:"Fuerza Pública",
+                valor: 0.104
+            }, {
+                actor: "Grupo no Identificado",
+                valor: 0.277
+            }];
+            let t = d3.transition("image").duration(1000);
+            let t2 = d3.transition("prevStep").duration(1000);
+            let t3 = d3.transition("thisStep").duration(1000);
+            let t4 = d3.transition("nextStep").duration(1000);
+            d3.select("#auc").transition(t2).style("opacity", 0);
+            d3.select("#participacion").transition(t3).style("opacity", 1);
+            d3.select("#paz").transition(t4).style("opacity", 0);
+            d3.select("svg").remove();
+            d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
+
+            var svg = d3.select("svg"),
+            margin = {top: 20, right: 20, bottom: 30, left: 40},
+            width = +svg.attr("width") - margin.left - margin.right,
+            height = +svg.attr("height") - margin.top - margin.bottom;
+
+            var x = d3.scaleBand().rangeRound([0, width]).padding(0.1),
+            y = d3.scaleLinear().rangeRound([height, 0]);
+
+            var g = svg.append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            d3.select("svg").style("opacity", 0).transition(t).style("opacity", 1);
+
+            datos.forEach(function(d){
+                d.valor = +d.valor;
+            });
+
+            x.domain(datos.map(function(d) { return d.actor; }));
+            y.domain([0, d3.max(datos, function(d) { return d.valor; })]);
+
+            g.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+
+            g.append("g")
+            .attr("class", "axis axis--y")
+            .call(d3.axisLeft(y).ticks(10, "%"))
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", "0.71em")
+            .attr("text-anchor", "end")
+            .text("Asesinatos");
+
+            let tb = d3.transition("bar").duration(1000);
+
+            let bars = g.selectAll(".bar")
+            .data(datos)
+            .enter().append("rect")
+            .attr("class", "bar")
+            .attr("x", function(d) { return x(d.actor); })
+            .attr("y", function(d) { return y(d.valor); })
+            .style("fill", "#008080")
+            .attr("width", x.bandwidth());
+
+            bars
+            .transition(tb)
+            .attr("height", function(d) { return height - y(d.valor); });
+            bars
+            .on("mouseover", function(d) {
+                let g = d3.select(this)
+                  .style("cursor", "pointer")
+                  .style("opacity", 0.7)
+                  .append("g")
+                  .attr("class", "text-group");
+              })
+            .on("mouseout", function(d) {
+                d3.select(this)
+                  .style("cursor", "none")  
+                  .style("opacity", 1)
+                  .select(".text-group").remove();
+              });
+        }
+
+        functions.push(stepParticipacion);
+        let step4 = function() {
+            let t = d3.transition("image").duration(1000);
+            let t2 = d3.transition("prevStep").duration(1000);
+            let t3 = d3.transition("thisStep").duration(1000);
+            let t4 = d3.transition("nextStep").duration(1000);
+
+            d3.select("#participacion").transition(t2).style("opacity", 0);
             d3.select("#paz").transition(t3).style("opacity", 1);
             d3.select("#end").transition(t4).style("opacity", 0);
             d3.select("svg").remove();
@@ -673,7 +841,23 @@ export default class Scrollytelling extends React.Component {
 -                                   con el asesinato de Jorge Eiécer Gaitán, daba inicio el periodo conocido como "La Violencia". Dicho conflicto terminaría
 -                                   en el año 1956 con la creación del frente nacional. No obstante, dicho acuerdo generó descontento en los partidos políticos
 -                                   no tradicionales, lo cual dió lugar a los grupos insurgentes conocidos como bandoleros.
-                                </p>
+                                    </p>
+                                </section>
+                                <section className="step" id="ELN">
+                                    <h1> Fundación ELN </h1>
+                                    <p>
+                                        En 1964 se da la fundación del ejercito de liberación nacional (ELN). Este fue conformado, en su inicio,
+                                        por estudiantes colombianos que viajaron a Cuba becados por el expresidente Fidel Castro. Este grupo, inicia
+                                        sus operaciones en Barrancabermeja, Santander. Su primera incursión armada fué en Simacota, en el mismo departamento.
+                                    </p>
+                                </section>
+                                <section className="step" id="M19">
+                                    <h1> Movimiento 19 de Abril </h1>
+                                    <p>
+                                        El día 19 de Abril de 1970, se conforma el grupo guerrillero de izquierda conocido como el movimiento 19 de Abril.
+                                        Su principal motivo consiste en disputar el fraude electoral de 1970, donde se nombró como presidente a Misael Pastrana,
+                                        en lugar de Gustavo Rojas Pinilla.
+                                    </p>
                                 </section>
                                 <section className="step" id="farc">
                                     <h1> Fundación FARC </h1>
@@ -688,6 +872,23 @@ export default class Scrollytelling extends React.Component {
                                     <div className="container">
                                         {this.renderTweets()}
                                     </div>
+                                </section>
+                                <section className="step" id="auc">
+                                    <h1> Autodefensas Unidas de Colombia </h1>
+                                    <p>
+                                        Se conforman en el año 1996, con la unión de diversos grupos de autodefensas que habían sido conformados previamente en las regiones de Córdoba y Urabá.
+                                        Estas son patrocinadas por ganaderos de la zona y su principal objetivo consiste en combatir a los grupos guerrilleros de izquierda como lo son las FARC,
+                                        el ELN y el EPL.
+                                    </p>
+                                </section>
+                                <section className="step" id="participacion">
+                                    <h1> Participación </h1>
+                                    <p>
+                                    Desde 1895 a 2012 fueron asesinadas cerca de 150.000 personas. De estas 23.161 (10.62) han sido asesinadas selectivamente. 
+                                    De estos 8.903 (38.4%) asesinatos han sido cometidos por grupos paramilitares, 3.899 (16.9%) por guerrillas, 
+                                    2.399 (10.4%) por fuerza pública y 6.406(27.7%) por grupos armados no identificados
+
+                                    </p>
                                 </section>
                                 <section className="step" id="paz">
                                     <h1> Tratado de Paz </h1>
