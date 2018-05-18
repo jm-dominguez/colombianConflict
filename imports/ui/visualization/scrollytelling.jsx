@@ -568,11 +568,20 @@ class Scrollytelling extends React.Component {
 
         functions.push(step3);
 
+        let fantasma1 = function(){
+            let t3 = d3.transition("thisStep").duration(1000);
+            d3.select("#tweets-farc").transition(t3).style("opacity", 1);
+        }
+
+        functions.push(fantasma1);
+
         let stepAUC = function () {
 
             let t = d3.transition("image").duration(1000);
+            let t2 = d3.transition("prevStep").duration(1000);
             let t3 = d3.transition("thisStep").duration(1000);
             let t4 = d3.transition("nextStep").duration(1000);
+            d3.select("#tweets-farc").transition(t3).style("opacity", 0);
             d3.select("#auc").transition(t3).style("opacity", 1);
             d3.select("#participacion").transition(t4).style("opacity", 0);
             d3.select("svg").remove();
@@ -713,8 +722,8 @@ class Scrollytelling extends React.Component {
             let t = d3.transition("image").duration(1000);
             let t2 = d3.transition("prevStep").duration(1000);
             let t3 = d3.transition("thisStep").duration(1000);
-            d3.select("#paz").style("opacity", 0);
-            d3.select("#end").style("opacity", 1);
+            d3.select("#paz").transition(t2).style("opacity", 0);
+            d3.select("#end").transition(t3).style("opacity", 1);
             d3.select("svg").remove();
             d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
             let g = d3.select("svg");
@@ -1003,6 +1012,9 @@ class Scrollytelling extends React.Component {
                                         {this.renderTweets()}
                                     </div>
                                 </section>
+                                <section className="step" id="fantasma1">
+                                    <h1> Some phantom text </h1>
+                                </section>
                                 <section className="step" id="auc">
                                     <h1> Autodefensas Unidas de Colombia </h1>
                                     <p>
@@ -1032,7 +1044,7 @@ class Scrollytelling extends React.Component {
                                 </section>
                                 <section className="step" id="end">
                                     <strong>
-                                        <h1> Thank You </h1>
+                                        <h1 id="gracias"> Gracias </h1>
                                     </strong>
                                 </section>
                             </div>
