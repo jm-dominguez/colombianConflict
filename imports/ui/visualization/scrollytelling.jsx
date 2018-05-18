@@ -498,7 +498,7 @@ export default class Scrollytelling extends React.Component {
 
         let stepAUC = function () {
 
-            let t = d3.transition("image").duration(0);
+            let t = d3.transition("image").duration(1000);
             let t3 = d3.transition("thisStep").duration(1000);
             let t4 = d3.transition("nextStep").duration(1000);
             d3.select("#auc").transition(t3).style("opacity", 1);
