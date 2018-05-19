@@ -1821,6 +1821,7 @@ class Scrollytelling extends React.Component {
                                     </p>
                                 </section>
                                 <section className="step" id="tweets-pal">
+                                    <h1> Tweets sobre la Toma del Palacio </h1>
                                     {this.renderTweets(this.state.pJusticiaTweets)}
                                 </section>
                                 <section className="step">
@@ -1836,6 +1837,7 @@ class Scrollytelling extends React.Component {
                                     </p>
                                 </section>
                                 <section className="step" id="tweets-caguan">
+                                    <h1> Tweets sobre los diálogos en el Caguán </h1>
                                     {this.renderTweets(this.state.caguanTweets)}
                                 </section>
                                 <section className="step">
