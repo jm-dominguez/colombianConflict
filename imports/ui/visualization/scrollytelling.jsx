@@ -35,25 +35,36 @@ class Scrollytelling extends React.Component {
         this.handleAnswerQ3 = this.handleAnswerQ3.bind(this);
         this.handleComment = this.handleComment.bind(this);
         this.handleCommentChange = this.handleCommentChange.bind(this);
+        this.renderQuestion1Graph = this.renderQuestion1Graph.bind(this);
+        this.renderQuestion2Graph = this.renderQuestion2Graph.bind(this);
+        this.renderQuestion3Graph = this.renderQuestion3Graph.bind(this);
+        this.renderAllQuestionGraphs = this.renderAllQuestionGraphs.bind(this);
         this.state = {
             status: "Login",
             pregunta1: "",
             pregunta2: "",
             pregunta3: "",
-            comment: ""
+            comment: "",
+            q1y: 0,
+            q1n: 0,
+            q2y: 0,
+            q2n: 0,
+            q3y: 0,
+            q3n: 0,
+            q1Answered: "no",
+            q2Answered: "no",
+            q3Answered: "no"
         }
     }
 
     handleSignUpButton(e) {
         e.preventDefault();
         this.setState({ status: "SignUp" })
-        console.log(this.state);
     }
 
     handleLoginButton(e) {
         e.preventDefault();
         this.setState({ status: "Login" });
-        console.log(this.state);
     }
 
     handleChangePregunta1(e) {
@@ -73,8 +84,21 @@ class Scrollytelling extends React.Component {
         if (this.state.pregunta1 === "") {
             alert("Por favor selecciona una respuesta");
         }
+        else if (Meteor.user() === undefined) {
+            alert("Tienes que iniciar sesión para poder votar");
+        }
         else {
-            alert("Voto registrado")
+            Meteor.call("poll.addNewAnswer", 1, this.state.pregunta1, (err, result) => {
+                if (err) {
+                    throw err;
+                }
+                else {
+                    alert("Voto registrado");
+                    this.pollData();
+                }
+            })
+
+
         }
     }
 
@@ -84,7 +108,17 @@ class Scrollytelling extends React.Component {
             alert("Por favor selecciona una respuesta");
         }
         else {
-            alert("Voto registrado")
+            Meteor.call("poll.addNewAnswer", 2, this.state.pregunta2, (err, result) => {
+                if (err) {
+                    throw err;
+                }
+                else {
+                    alert("Voto registrado");
+                    this.pollData();
+                }
+            })
+
+
         }
     }
 
@@ -94,9 +128,20 @@ class Scrollytelling extends React.Component {
             alert("Por favor selecciona una respuesta");
         }
         else {
-            alert("Voto registrado")
+            Meteor.call("poll.addNewAnswer", 3, this.state.pregunta3, (err, result) => {
+                if (err) {
+                    throw err;
+                }
+                else {
+                    alert("Voto registrado");
+                    this.pollData();
+                }
+            })
+
+
         }
     }
+
 
     componentWillMount() {
         Meteor.call("getTweets", "FARC", (err, result) => {
@@ -175,124 +220,298 @@ class Scrollytelling extends React.Component {
 
         step0();
 
+        this.pollData();
+
+    }
+
+    pollData() {
+        if (Meteor.user() !== undefined && Meteor.user() !== null) {
+            this.setState({ q1Answered: Meteor.user().profile.q1, q2Answered: Meteor.user().profile.q2, q3Answered: Meteor.user().profile.q3 })
+        }
         Meteor.call("poll.findByQuestion", 1, (err, result) => {
             if (err) {
                 throw err;
             }
+            else {
+                this.setState({ q1y: result.yes, q1n: result.no })
+
+            }
         });
 
-        var myData = [100, 40, 60],
-            myData2 = [100, 40, 60],
-            myData3 = [100, 49, 51],
-            margin = { top: 10, bottom: 20, left: 50, right: 10 },
-            width = 500,
-            height = 300,
-            barHeight = 20;
+        Meteor.call("poll.findByQuestion", 2, (err, result) => {
+            if (err) {
+                throw err;
+            }
+            else {
+                this.setState({ q2y: result.yes, q2n: result.no });
+            }
+        });
 
+        Meteor.call("poll.findByQuestion", 3, (err, result) => {
+            if (err) {
+                throw err;
+            }
+            else {
+                this.setState({ q3y: result.yes, q3n: result.no });
+            }
+        });
+    }
 
-        var chartQuestion1 = d3.select("#chartQuestion1")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        var chartQuestion2 = d3.select("#chartQuestion2")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        var chartQuestion3 = d3.select("#chartQuestion3")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        var xAxis = chartQuestion1.append("g")
-            .attr("class", "y axis")
-
-        var xAxis2 = chartQuestion2.append("g")
-            .attr("class", "y axis")
-
-        var xAxis3 = chartQuestion3.append("g")
-            .attr("class", "y axis")
-
-        var yScale = d3.scaleLinear()
-            .range([height, 0])
-
-
-        function update(myData, myData2, myData3) {
-            yScale
-                .domain([0, d3.max(myData3)]);
-
-            var ps = chartQuestion1.selectAll("rect")
-                .data(myData);
-
-            // New items
-            ps.enter() // enter
-                .append("rect")
-                .merge(ps) // enter + update
-                .text(function (d) { return d; })
-                .style("fill", "#3ba1e5")
-                .attr("y", function (d) {
-                    return yScale.range()[0] - yScale(d);
-                })
-                .attr("x", function (d, i) {
-                    return d;
-                })
-                .attr("width", barHeight)
-                .attr("height", function (d) {
-                    return yScale(d)
-                });
-
-            xAxis.call(d3.axisLeft(yScale));
-
-            var ps2 = chartQuestion2.selectAll("rect")
-                .data(myData2);
-
-            // New items
-            ps2.enter() // enter
-                .append("rect")
-                .merge(ps) // enter + update
-                .text(function (d) { return d; })
-                .style("fill", "#3ba1e5")
-                .attr("y", function (d) {
-                    return yScale.range()[0] - yScale(d);
-                })
-                .attr("x", function (d, i) {
-                    return d;
-                })
-                .attr("width", barHeight)
-                .attr("height", function (d) {
-                    return yScale(d)
-                });
-
-            xAxis2.call(d3.axisLeft(yScale));
-
-            var ps3 = chartQuestion3.selectAll("rect")
-                .data(myData3);
-
-            // New items
-            ps3.enter() // enter
-                .append("rect")
-                .merge(ps) // enter + update
-                .text(function (d) { return d; })
-                .style("fill", "#3ba1e5")
-                .attr("y", function (d) {
-                    return yScale.range()[0] - yScale(d);
-                })
-                .attr("x", function (d, i) {
-                    return d;
-                })
-                .attr("width", barHeight)
-                .attr("height", function (d) {
-                    return yScale(d)
-                });
-
-            xAxis3.call(d3.axisLeft(yScale));
+    renderAllQuestionGraphs() {
+        if (this.state.q1n !== 0 && this.state.q1y !== 0) {
+            this.renderQuestion1Graph();
         }
 
-        update(myData, myData2, myData3);
+        if (this.state.q2n !== 0 && this.state.q2y !== 0) {
+            this.renderQuestion2Graph();
+        }
+
+        if (this.state.q3n !== 0 && this.state.q3y !== 0) {
+            this.renderQuestion3Graph();
+        }
+    }
+
+    renderQuestion1Graph() {
+        let total = this.state.q1y + this.state.q1n;
+
+        let datos = [{
+            actor: "Sí",
+            valor: this.state.q1y / total
+        },
+        {
+            actor: "No",
+            valor: this.state.q1n / total
+        }];
+
+        let margin = { top: 20, right: 20, bottom: 30, left: 40 },
+            width = + 500 - margin.left - margin.right,
+            height = + 500 - margin.top - margin.bottom;
+
+        let svg = d3.select("#chartQuestion1")
+            .attr("width", 600 + margin.left + margin.right)
+            .attr("height", 600 + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        svg.html("");
+
+        let x = d3.scaleBand().rangeRound([0, width]).padding(0.1),
+            y = d3.scaleLinear().rangeRound([height, 0]);
+
+        let g = svg.append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        datos.forEach(function (d) {
+            d.valor = +d.valor;
+        });
+
+        x.domain(datos.map(function (d) { return d.actor; }));
+        y.domain([0, 1]);
+
+        g.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+
+        g.append("g")
+            .attr("class", "axis axis--y")
+            .call(d3.axisLeft(y).ticks(10, "%"))
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", "0.71em")
+            .attr("text-anchor", "end")
+            .text("Respuestas pregunta 1");
+
+        let tb = d3.transition("bar").duration(1000);
+
+        let bars = g.selectAll(".bar")
+            .data(datos)
+            .enter().append("rect")
+            .attr("class", "bar")
+            .attr("x", function (d) { return x(d.actor); })
+            .attr("y", function (d) { return y(d.valor); })
+            .style("fill", "#008080")
+            .attr("width", x.bandwidth());
+
+        bars
+            .transition(tb)
+            .attr("height", function (d) { return height - y(d.valor); });
+        bars
+            .on("mouseover", function (d) {
+                let g = d3.select(this)
+                    .style("cursor", "pointer")
+                    .style("opacity", 0.7)
+                    .append("g")
+                    .attr("class", "text-group");
+            })
+            .on("mouseout", function (d) {
+                d3.select(this)
+                    .style("cursor", "none")
+                    .style("opacity", 1)
+                    .select(".text-group").remove();
+            });
+
+    }
+
+    renderQuestion2Graph() {
+        let total = this.state.q2y + this.state.q2n;
+
+        let datos = [{
+            actor: "Sí",
+            valor: this.state.q2y / total
+        },
+        {
+            actor: "No",
+            valor: this.state.q2n / total
+        }];
+
+        let margin = { top: 20, right: 20, bottom: 30, left: 40 },
+            width = + 500 - margin.left - margin.right,
+            height = + 500 - margin.top - margin.bottom;
+
+        let svg = d3.select("#chartQuestion2")
+            .attr("width", 600 + margin.left + margin.right)
+            .attr("height", 600 + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        let x = d3.scaleBand().rangeRound([0, width]).padding(0.1),
+            y = d3.scaleLinear().rangeRound([height, 0]);
+
+        let g = svg.append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        datos.forEach(function (d) {
+            d.valor = +d.valor;
+        });
+
+        x.domain(datos.map(function (d) { return d.actor; }));
+        y.domain([0, 1]);
+
+        g.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+
+        g.append("g")
+            .attr("class", "axis axis--y")
+            .call(d3.axisLeft(y).ticks(10, "%"))
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", "0.71em")
+            .attr("text-anchor", "end")
+            .text("Respuestas pregunta 2");
+
+        let tb = d3.transition("bar").duration(1000);
+
+        let bars = g.selectAll(".bar")
+            .data(datos)
+            .enter().append("rect")
+            .attr("class", "bar")
+            .attr("x", function (d) { return x(d.actor); })
+            .attr("y", function (d) { return y(d.valor); })
+            .style("fill", "#008080")
+            .attr("width", x.bandwidth());
+
+        bars
+            .transition(tb)
+            .attr("height", function (d) { return height - y(d.valor); });
+        bars
+            .on("mouseover", function (d) {
+                let g = d3.select(this)
+                    .style("cursor", "pointer")
+                    .style("opacity", 0.7)
+                    .append("g")
+                    .attr("class", "text-group");
+            })
+            .on("mouseout", function (d) {
+                d3.select(this)
+                    .style("cursor", "none")
+                    .style("opacity", 1)
+                    .select(".text-group").remove();
+            });
+
+    }
+
+    renderQuestion3Graph() {
+        let total = this.state.q3y + this.state.q3n;
+
+        let datos = [{
+            actor: "Sí",
+            valor: this.state.q3y / total
+        },
+        {
+            actor: "No",
+            valor: this.state.q3n / total
+        }];
+
+        let margin = { top: 20, right: 20, bottom: 30, left: 40 },
+            width = + 500 - margin.left - margin.right,
+            height = + 500 - margin.top - margin.bottom;
+
+        let svg = d3.select("#chartQuestion3")
+            .attr("width", 600 + margin.left + margin.right)
+            .attr("height", 600 + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        let x = d3.scaleBand().rangeRound([0, width]).padding(0.1),
+            y = d3.scaleLinear().rangeRound([height, 0]);
+
+        let g = svg.append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        datos.forEach(function (d) {
+            d.valor = +d.valor;
+        });
+
+        x.domain(datos.map(function (d) { return d.actor; }));
+        y.domain([0, 1]);
+
+        g.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+
+        g.append("g")
+            .attr("class", "axis axis--y")
+            .call(d3.axisLeft(y).ticks(10, "%"))
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", "0.71em")
+            .attr("text-anchor", "end")
+            .text("Respuestas pregunta 2");
+
+        let tb = d3.transition("bar").duration(1000);
+
+        let bars = g.selectAll(".bar")
+            .data(datos)
+            .enter().append("rect")
+            .attr("class", "bar")
+            .attr("x", function (d) { return x(d.actor); })
+            .attr("y", function (d) { return y(d.valor); })
+            .style("fill", "#008080")
+            .attr("width", x.bandwidth());
+
+        bars
+            .transition(tb)
+            .attr("height", function (d) { return height - y(d.valor); });
+        bars
+            .on("mouseover", function (d) {
+                let g = d3.select(this)
+                    .style("cursor", "pointer")
+                    .style("opacity", 0.7)
+                    .append("g")
+                    .attr("class", "text-group");
+            })
+            .on("mouseout", function (d) {
+                d3.select(this)
+                    .style("cursor", "none")
+                    .style("opacity", 1)
+                    .select(".text-group").remove();
+            });
 
     }
 
@@ -468,7 +687,7 @@ class Scrollytelling extends React.Component {
 
         functions.push(step1);
 
-        let actores = function(){
+        let actores = function () {
             let t = d3.transition("image").duration(1000);
             let t2 = d3.transition("prevStep").duration(1000);
             let t3 = d3.transition("thisStep").duration(1000);
@@ -595,7 +814,7 @@ class Scrollytelling extends React.Component {
 
         functions.push(step3);
 
-        let fantasma1 = function(){
+        let fantasma1 = function () {
             let t3 = d3.transition("thisStep").duration(1000);
             d3.select("#tweets-farc").transition(t3).style("opacity", 1);
         }
@@ -720,7 +939,7 @@ class Scrollytelling extends React.Component {
         }
 
         functions.push(stepParticipacion);
-        let stepEventos = function(){
+        let stepEventos = function () {
             let t = d3.transition("image").duration(1000);
             let t2 = d3.transition("prevStep").duration(1000);
             let t3 = d3.transition("thisStep").duration(1000);
@@ -733,25 +952,25 @@ class Scrollytelling extends React.Component {
 
             let datos = [{
                 label: "Toma Palacio de Justicia",
-                times:[{
+                times: [{
                     "starting_time": 500101200000,
                     "ending_time": 500187600000
                 }]
-            },{
+            }, {
                 label: "Proceso 8000",
                 times: [{
                     "starting_time": 805957200000,
                     "ending_time": 836629200000
                 }]
 
-            },{
+            }, {
                 label: "Toma de Mitú",
                 times: [{
                     "starting_time": 909896400000,
                     "ending_time": 910155600000
                 }]
-            },{
-                label:"Negociaciones de El Caguán",
+            }, {
+                label: "Negociaciones de El Caguán",
                 times: [{
                     "starting_time": 915685200000,
                     "ending_time": 1014267600000
@@ -771,25 +990,25 @@ class Scrollytelling extends React.Component {
             }];
 
             var chart = timelines()
-                        .beginning(datos[0].times[0].starting_time)
-                        .ending(datos[5].times[0].ending_time)
-                        .stack()
-                        .tickFormat({
-                            format: d3.timeFormat("%Y"),
-                            tickTime: d3.timeYear,
-                            tickInterval: 10,
-                            tickSize: 10,
-                            tickValues: null
-                        });
- 
+                .beginning(datos[0].times[0].starting_time)
+                .ending(datos[5].times[0].ending_time)
+                .stack()
+                .tickFormat({
+                    format: d3.timeFormat("%Y"),
+                    tickTime: d3.timeYear,
+                    tickInterval: 10,
+                    tickSize: 10,
+                    tickValues: null
+                });
+
             var svg = d3.select("#vis").append("svg").attr("width", 600).attr("height", 600).attr("transform", "translate(0, 100)")
-                        .datum(datos).call(chart);
+                .datum(datos).call(chart);
             svg.style("opacity", 0).transition(t).style("opacity", 1);
-                        
-           
+
+
         }
         functions.push(stepEventos);
-        let palJusticia = function(){
+        let palJusticia = function () {
             let t = d3.transition("image").duration(1000);
             let t2 = d3.transition("prevStep").duration(1000);
             let t3 = d3.transition("thisStep").duration(1000);
@@ -813,7 +1032,7 @@ class Scrollytelling extends React.Component {
         }
 
         functions.push(palJusticia);
-        let tweetsPal = function(){
+        let tweetsPal = function () {
             let t = d3.transition("image").duration(1000);
             let t2 = d3.transition("prevStep").duration(1000);
             let t3 = d3.transition("thisStep").duration(1000);
@@ -833,12 +1052,12 @@ class Scrollytelling extends React.Component {
                 .attr("height", "100%");
         }
         functions.push(tweetsPal);
-        let fantasma2 = function(){
+        let fantasma2 = function () {
             let t3 = d3.transition("thisStep").duration(1000);
             d3.select("#tweets-pal").transition(t3).style("opacity", 1);
         }
         functions.push(fantasma2);
-        let caguan = function(){
+        let caguan = function () {
             let t = d3.transition("image").duration(1000);
             let t2 = d3.transition("prevStep").duration(1000);
             let t3 = d3.transition("thisStep").duration(1000);
@@ -862,7 +1081,7 @@ class Scrollytelling extends React.Component {
         }
 
         functions.push(caguan);
-        let tweetsCaguan = function(){
+        let tweetsCaguan = function () {
             let t = d3.transition("image").duration(1000);
             let t2 = d3.transition("prevStep").duration(1000);
             let t3 = d3.transition("thisStep").duration(1000);
@@ -882,12 +1101,12 @@ class Scrollytelling extends React.Component {
                 .attr("height", "100%");
         }
         functions.push(tweetsCaguan);
-        let fantasma3 = function(){
+        let fantasma3 = function () {
             let t3 = d3.transition("thisStep").duration(1000);
             d3.select("#tweets-caguan").transition(t3).style("opacity", 1);
         }
         functions.push(fantasma3);
-        let masacres = function(){
+        let masacres = function () {
             let t = d3.transition("image").duration(1000);
             let t2 = d3.transition("prevStep").duration(1000);
             let t3 = d3.transition("thisStep").duration(1000);
@@ -897,73 +1116,73 @@ class Scrollytelling extends React.Component {
             d3.select("#masacres").transition(t3).style("opacity", 1);
             d3.select("#secuestros").transition(t4).style("opacity", 0);
             d3.select("svg").remove();
-            var margin = {top: 100, right: 100, bottom: 100, left: 150},
-                         width = 600 - margin.left - margin.right,
-                         height = 600 - margin.top - margin.bottom;
-            
-            
-            let datos =[{
+            var margin = { top: 100, right: 100, bottom: 100, left: 150 },
+                width = 600 - margin.left - margin.right,
+                height = 600 - margin.top - margin.bottom;
+
+
+            let datos = [{
                 actor: "Grupos Paramilitares",
                 valor: 0.588
             }, {
                 actor: "Guerrillas",
                 valor: 0.173
-            },{
+            }, {
                 actor: "Fuerza Pública",
                 valor: 0.08
             }, {
                 actor: "Grupo no identificado",
                 valor: 0.149
-            },{
+            }, {
                 actor: "Otros",
                 valor: 0.01
             }];
 
-            datos.forEach(function(d) {
+            datos.forEach(function (d) {
                 d.valor = +d.valor;
-              });
-            
+            });
+
             var y = d3.scaleBand()
-                        .range([height, 0])
-                        .padding(0.1);
+                .range([height, 0])
+                .padding(0.1);
 
             var x = d3.scaleLinear()
-                        .range([0, width]);
+                .range([0, width]);
 
             var svg = d3.select("#vis").append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", 
-                  "translate(" + margin.left + "," + margin.top + ")");
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform",
+                    "translate(" + margin.left + "," + margin.top + ")");
 
-            x.domain([0, d3.max(datos, function(d){ return d.valor; })])
-            y.domain(datos.map(function(d) { return d.actor; }));
+            x.domain([0, d3.max(datos, function (d) { return d.valor; })])
+            y.domain(datos.map(function (d) { return d.actor; }));
 
             let tb = d3.transition("bar").duration(1000);
 
             svg.selectAll(".bar")
-               .data(datos)
-               .enter().append("rect")
-               .attr("class", "bar")
-               .transition(tb)
-               .attr("width", function(d) {return x(d.valor); } )
-               .attr("y", function(d) { return y(d.actor); })
-               .attr("height", y.bandwidth())
-               .style("fill", "#229934");
-            
-               svg.append("g")
-               .attr("transform", "translate(0," + height + ")")
-               .call(d3.axisBottom(x))
+                .data(datos)
+                .enter().append("rect")
+                .attr("class", "bar")
+                .transition(tb)
+                .attr("width", function (d) { return x(d.valor); })
+                .attr("y", function (d) { return y(d.actor); })
+                .attr("height", y.bandwidth())
+                .style("fill", "#229934");
 
-               svg.append("g")
-                  .call(d3.axisLeft(y));
+            svg.append("g")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x))
 
-               svg.style("opacity", 0).transition(t).style("opacity", 1);
+            svg.append("g")
+                .call(d3.axisLeft(y));
+
+            svg.style("opacity", 0).transition(t).style("opacity", 1);
         }
         functions.push(masacres);
 
-        let secuestros = function(){
+        let secuestros = function () {
             let datos = [{
                 actor: "Grupos Paramilitares",
                 valor: 0.094
@@ -1071,19 +1290,19 @@ class Scrollytelling extends React.Component {
                 .transition(t)
                 .style("opacity", 1);
 
-           
+
         }
 
         functions.push(step4);
 
-        let referencias = function(){
+        let referencias = function () {
             let t = d3.transition("image").duration(1000);
             let t2 = d3.transition("prevStep").duration(1000);
             let t3 = d3.transition("thisStep").duration(1000);
             let t4 = d3.transition("nextStep").duration(1000);
             d3.select("#paz").transition(t2).style("opacity", 0);
             d3.select("#referencias").transition(t3).style("opacity", 1);
-            d3.select("#end").transition(t4).style("opacity",0)
+            d3.select("#end").transition(t4).style("opacity", 0)
             d3.select("svg").remove();
             d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
             let g = d3.select("svg");
@@ -1166,7 +1385,10 @@ class Scrollytelling extends React.Component {
                     email: this.state.email,
                     password: this.state.password,
                     profile: {
-                        name: this.state.name
+                        name: this.state.name,
+                        q1: "no",
+                        q2: "no",
+                        q3: "no"
                     }
                 }, (err) => {
                     if (err) {
@@ -1200,7 +1422,7 @@ class Scrollytelling extends React.Component {
                 }
                 else {
                     alert("Ingresado correctamente");
-                    this.setState({ status: "Loged" })
+                    this.setState({ status: "Loged" });
                 }
             });
         }
@@ -1235,7 +1457,7 @@ class Scrollytelling extends React.Component {
         }
         else {
             Meteor.call("comments.add", this.state.comment, Meteor.user().emails[0].address, Meteor.user().profile.name);
-            alert("Comment añadido!");
+            alert("Comentario añadido!");
 
             document.getElementById("commentTextBox").value = ""
             this.state.comment = ""
@@ -1251,8 +1473,8 @@ class Scrollytelling extends React.Component {
             return (
                 <div>
                     <h2>Ingresa para poder participar en la encuesta</h2>
-                    <button id="login" type="button" className="btn btn-primary" onClick={this.handleLoginButton}> Iniciar sesión </button>
-                    <button id="signup" type="button" className="btn btn-primary" onClick={this.handleSignUpButton}> Registrate </button>
+                    <button id="login" type="button" onClick={this.handleLoginButton}> Iniciar sesión </button>
+                    <button id="signup" type="button" onClick={this.handleSignUpButton}> Registrate </button>
                     <br />
                     <form>
                         <div className="form-group">
@@ -1264,7 +1486,7 @@ class Scrollytelling extends React.Component {
                             <input type="password" className="form-control" id="pwd" placeholder="Ingresa tu contraseña" name="pswd" onChange={this.handlePassword} />
                         </div>
                         <br />
-                        <button type="submit" className="btn btn-primary" onClick={this.handleLogin}>Ingresar</button>
+                        <button type="submit" onClick={this.handleLogin}>Ingresar</button>
                     </form>
                 </div>
             )
@@ -1273,8 +1495,8 @@ class Scrollytelling extends React.Component {
             return (
                 <div>
                     <h2>Ingresa para poder participar en la encuesta</h2>
-                    <button id="login" type="button" className="btn btn-primary" onClick={this.handleLoginButton}> Iniciar sesión </button>
-                    <button id="signup" type="button" className="btn btn-primary" onClick={this.handleSignUpButton}> Registrate </button>
+                    <button id="login" type="button" onClick={this.handleLoginButton}> Iniciar sesión </button>
+                    <button id="signup" type="button" onClick={this.handleSignUpButton}> Registrate </button>
                     <br />
                     <form>
                         <div className="form-group">
@@ -1294,19 +1516,19 @@ class Scrollytelling extends React.Component {
                             <input type="password" className="form-control" id="confirmPswd" placeholder="Confirma tu contraseña" name="confirmPswd" onChange={this.handleConfirmPassword} />
                         </div>
                         <br />
-                        <button type="submit" className="btn btn-primary" onClick={this.handleCreateAccount}>Crear cuenta</button>
+                        <button type="submit" onClick={this.handleCreateAccount}>Crear cuenta</button>
 
                     </form>
                 </div>
             )
         }
         else if (this.state.status === "Loged") {
-            if (Meteor.user() !== undefined) {
+            if (Meteor.user() !== null && Meteor.user() !== undefined) {
                 return (
                     <div>
                         <h2>Hola <strong> {Meteor.user().profile.name}</strong></h2>
                         <br />
-                        <button type="submit" className="btn btn-primary" onClick={this.handleLogOut}>Cerrar sesión</button>
+                        <button type="submit" id="logoutButton" onClick={this.handleLogOut}>Cerrar sesión</button>
                     </div>
                 )
             }
@@ -1327,6 +1549,163 @@ class Scrollytelling extends React.Component {
 
         return "Realizo un comentario el " + day + " de " + monthNames[monthIndex] + " del " + year
     }
+
+    renderFormQ1() {
+        if (Meteor.user() !== null && Meteor.user() !== undefined) {
+            if (Meteor.user().profile.q1.split("/")[0] === "no") {
+                return (
+                    <div>
+                        <div className="panel panel-white post panel-shadow questions">
+                            <fieldset className="form-group" onChange={this.handleChangePregunta1}>
+                                <legend>¿Estás de acuerdo con la realización del acuerdo de paz con las FARC?</legend>
+                                <div className="form-check">
+                                    <label className="form-check-label">
+                                        <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios1" value="si" />
+                                        Sí</label>
+                                </div>
+                                <div className="form-check">
+                                    <label className="form-check-label">
+                                        <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios2" value="no" />
+                                        No</label>
+                                </div>
+                            </fieldset>
+                            <button type="submit" onClick={this.handleAnswerQ1}>Aceptar</button>
+                        </div>
+                    </div>
+                )
+            }
+            else if (Meteor.user().profile.q1.split("/")[0] === "yes") {
+                return (
+                    <div>
+                        <div className="panel panel-white post panel-shadow questions">
+                            <fieldset className="form-group" onChange={this.handleChangePregunta1}>
+                                <legend>¿Estás de acuerdo con la realización del acuerdo de paz con las FARC?</legend>
+                                <p>Ya votaste por: <strong>{Meteor.user().profile.q1.split("/")[1]}</strong></p>
+                            </fieldset>
+                        </div>
+                    </div>
+                )
+            }
+        }
+
+        else {
+            return (
+                <div>
+                    <div className="panel panel-white post panel-shadow questions">
+                        <fieldset className="form-group" onChange={this.handleChangePregunta1}>
+                            <legend>¿Estás de acuerdo con la realización del acuerdo de paz con las FARC?</legend>
+
+                        </fieldset>
+                    </div>
+                </div>
+            )
+        }
+
+    }
+
+    renderFormQ2() {
+        if (Meteor.user() !== null && Meteor.user() !== undefined) {
+            if (Meteor.user().profile.q2.split("/")[0] === "no") {
+                return (
+                    <div>
+                        <div className="panel panel-white post panel-shadow questions">
+                            <fieldset className="form-group" onChange={this.handleChangePregunta2}>
+                                <legend>¿Estás de acuerdo con la participación de las FARC en la politica colombiana?</legend>
+                                <div className="form-check">
+                                    <label className="form-check-label">
+                                        <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios1" value="si" />
+                                        Sí</label>
+                                </div>
+                                <div className="form-check">
+                                    <label className="form-check-label">
+                                        <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios2" value="no" />
+                                        No</label>
+                                </div>
+
+                            </fieldset>
+                            <button type="submit" onClick={this.handleAnswerQ2}>Aceptar</button>
+                        </div>
+                    </div>
+                )
+            }
+            else if (Meteor.user().profile.q2.split("/")[0] === "yes") {
+                return (
+                    <div>
+                        <div className="panel panel-white post panel-shadow questions">
+                            <fieldset className="form-group" onChange={this.handleChangePregunta1}>
+                                <legend>¿Estás de acuerdo con la participación de las FARC en la politica colombiana?</legend>
+                                <p>Ya votaste por: <strong>{Meteor.user().profile.q2.split("/")[1]}</strong></p>
+                            </fieldset>
+                        </div>
+                    </div>
+                )
+            }
+        }
+        else {
+            return (
+                <div>
+                    <div className="panel panel-white post panel-shadow questions">
+                        <fieldset className="form-group" onChange={this.handleChangePregunta1}>
+                            <legend>¿Estás de acuerdo con la participación de las FARC en la politica colombiana?</legend>
+
+                        </fieldset>
+                    </div>
+                </div>
+            )
+        }
+    }
+
+    renderFormQ3() {
+        if (Meteor.user() !== null && Meteor.user() !== undefined) {
+            if (Meteor.user().profile.q3.split("/")[0] === "no") {
+                return (
+                    <div>
+                        <div className="panel panel-white post panel-shadow questions">
+                            <fieldset className="form-group" onChange={this.handleChangePregunta3}>
+                                <legend>¿Estás de acuerdo con la realización de un acuerdo de paz con el ELN?</legend>
+                                <div className="form-check">
+                                    <label className="form-check-label">
+                                        <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios1" value="si" />
+                                        Sí</label>
+                                </div>
+                                <div className="form-check">
+                                    <label className="form-check-label">
+                                        <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios2" value="no" />
+                                        No</label>
+                                </div>
+                            </fieldset>
+                            <button type="submit" onClick={this.handleAnswerQ3}>Aceptar</button>
+                        </div>
+                    </div>
+                )
+            }
+            else if (Meteor.user().profile.q3.split("/")[0] === "yes") {
+                return (
+                    <div>
+                        <div className="panel panel-white post panel-shadow questions">
+                            <fieldset className="form-group" onChange={this.handleChangePregunta1}>
+                                <legend>¿Estás de acuerdo con la realización de un acuerdo de paz con el ELN?</legend>
+                                <p>Ya votaste por: <strong>{Meteor.user().profile.q3.split("/")[1]}</strong></p>
+                            </fieldset>
+                        </div>
+                    </div>
+                )
+            }
+        }
+        else {
+            return (
+                <div>
+                    <div className="panel panel-white post panel-shadow questions">
+                        <fieldset className="form-group" onChange={this.handleChangePregunta1}>
+                            <legend>¿Estás de acuerdo con la realización de un acuerdo de paz con el ELN?</legend>
+
+                        </fieldset>
+                    </div>
+                </div>
+            )
+        }
+    }
+
     render() {
         return (
             <div className="container-fluid">
@@ -1370,7 +1749,7 @@ class Scrollytelling extends React.Component {
                                         A lo largo del conflicto, se han visto envueltos diferentes actores con diferentes ideologías políticas,
                                         entre estos se encuentran los grupos guerrilleros de izquierda como el ELN, el EPL, el M-19 o las FARC. Adicionalmente,
                                         hace parte del conflicto los grupos paramilitares o autodefensas, entre las cuales destacan las AUC. Finalmente, el último
-                                        gran participante es el estado colombiano. 
+                                        gran participante es el estado colombiano.
                                     </p>
                                 </section>
                                 <section className="step" id="ELN">
@@ -1428,16 +1807,16 @@ class Scrollytelling extends React.Component {
                                     <p>
                                         A lo largo del conflicto han ocurrido diversos sucesos que han marcado la historia del país.
                                         Desde atentados terroristas, hasta negociaciones de paz fallidas, y procesos de desmovilización.
-                                        Entre los más destacados se encuentra, la toma del palacio de justicia, las negociaciones de paz de San 
+                                        Entre los más destacados se encuentra, la toma del palacio de justicia, las negociaciones de paz de San
                                         Vicente del Caguán, la Operación Jaque y el tratado de paz recientemente consumado.
                                     </p>
                                 </section>
                                 <section className="step" id="pal-justicia">
                                     <h1> Toma del Palacio de Justicia </h1>
                                     <p>
-                                        En los días 6 y 7 de Noviembre del año 1985, el M-19 perpetra la toma del palacio de justicia de Bogotá. En 
-                                        el inicio del suceso, el grupo guerrillero mantuvo 350 rehénes. Sin embargo, con el paso del tiempo la situación 
-                                        se violentó y dejó un saldo de 98 muertos. A día de hoy, aún no se cuenta con cifras exactas para evaluar el número de 
+                                        En los días 6 y 7 de Noviembre del año 1985, el M-19 perpetra la toma del palacio de justicia de Bogotá. En
+                                        el inicio del suceso, el grupo guerrillero mantuvo 350 rehénes. Sin embargo, con el paso del tiempo la situación
+                                        se violentó y dejó un saldo de 98 muertos. A día de hoy, aún no se cuenta con cifras exactas para evaluar el número de
                                         víctimas.
                                     </p>
                                 </section>
@@ -1450,9 +1829,9 @@ class Scrollytelling extends React.Component {
                                 <section className="step" id="caguan">
                                     <h1> Negociaciones en San Vicente del Caguán </h1>
                                     <p>
-                                        El 7 de enero de 1999 el gobierno del presidente Andrés Pastrana, establece una zona de distención en el municipio de 
-                                        San Vicente del Caguán, con el objetivo de entablar diálogos de paz con las FARC. Dichas negociaciones se extenderían durante 
-                                        alrededor de tres años. Estas finalizan el 21 de Febrero de 2002, con el rompimiento del diálogo y tienen como resultado, la 
+                                        El 7 de enero de 1999 el gobierno del presidente Andrés Pastrana, establece una zona de distención en el municipio de
+                                        San Vicente del Caguán, con el objetivo de entablar diálogos de paz con las FARC. Dichas negociaciones se extenderían durante
+                                        alrededor de tres años. Estas finalizan el 21 de Febrero de 2002, con el rompimiento del diálogo y tienen como resultado, la
                                         implementación del Plan Colombia, por parte del estado colombiano.
                                     </p>
                                 </section>
@@ -1465,16 +1844,16 @@ class Scrollytelling extends React.Component {
                                 <section className="step" id="masacres">
                                     <h1>Masacres</h1>
                                     <p>
-                                    Desde 1985 a 2012 han ocurrido 1982 masacres. 1.166 (58.8%) de estas fueron cometidos por grupos paramilitares, 343 (17.3%) por guerrillas, 
-                                    158 (8%) por fuerza pública, 295 (14.9%) por grupos armados no identificados y 20 (1%) por grupos paramilitares y miembros de la fuerza pública 
-                                    u otros grupos armados. Entre las más destacadas se encuentran la toma a Mitú y la toma a Miraflores, ambas perpetradas por las FARC.
+                                        Desde 1985 a 2012 han ocurrido 1982 masacres. 1.166 (58.8%) de estas fueron cometidos por grupos paramilitares, 343 (17.3%) por guerrillas,
+                                        158 (8%) por fuerza pública, 295 (14.9%) por grupos armados no identificados y 20 (1%) por grupos paramilitares y miembros de la fuerza pública
+                                        u otros grupos armados. Entre las más destacadas se encuentran la toma a Mitú y la toma a Miraflores, ambas perpetradas por las FARC.
                                     </p>
                                 </section>
                                 <section className="step" id="secuestros">
                                     <h1> Secuestros </h1>
                                     <p>
-                                    En Colombia, entre los años de 1958 y 2012, han secuestrado a 27.023 personas. 24.482 (90.6%) personas han sido secuestradas por guerrillas y 2.541 (9.4%) 
-                                    por grupos paramilitares.
+                                        En Colombia, entre los años de 1958 y 2012, han secuestrado a 27.023 personas. 24.482 (90.6%) personas han sido secuestradas por guerrillas y 2.541 (9.4%)
+                                        por grupos paramilitares.
                                     </p>
                                 </section>
                                 <section className="step" id="paz">
@@ -1494,15 +1873,15 @@ class Scrollytelling extends React.Component {
                                         <li> <a href="http://www.eltiempo.com/" target="_blank"> El Tiempo </a> </li>
                                         <li> <a href="http://www.elespectador.com/" target="_blank"> El espectador </a> </li>
                                         <li> <a href="http://www.centrodememoriahistorica.gov.co/micrositios/informeGeneral/estadisticas.html" target="_blank">Centro de Memoria Histórica </a> </li>
-                                        <li> <a href = "https://es.wikipedia.org/wiki/Conflicto_armado_interno_en_Colombia" target="_blank"> Wikipedia </a> </li>
+                                        <li> <a href="https://es.wikipedia.org/wiki/Conflicto_armado_interno_en_Colombia" target="_blank"> Wikipedia </a> </li>
                                     </ul>
                                 </section>
                                 <section className="step" id="end">
                                     <strong>
                                         <h1 id="gracias"> Gracias </h1>
                                         <p>
-                                           No puedes separar la paz de la libertad, porque nadie puede estar en paz, a no ser que tenga su libertad.
-                                        </p> 
+                                            No puedes separar la paz de la libertad, porque nadie puede estar en paz, a no ser que tenga su libertad.
+                                        </p>
                                         -Malcolm X
                                     </strong>
                                 </section>
@@ -1510,6 +1889,11 @@ class Scrollytelling extends React.Component {
 
                             <div id="vis">
                             </div>
+
+                            {
+                                this.renderAllQuestionGraphs()
+                            }
+
 
                             <br />
                             <div className="row">
@@ -1523,154 +1907,113 @@ class Scrollytelling extends React.Component {
                             <h2>Participa en una pequeña encuesta sobre el conflicto armado en Colombia</h2>
                             <br />
                             <div className="row">
-                                <div className="col-md-1"></div>
-                                <div className="col-md-5">
-
-                                    <div className="panel panel-white post panel-shadow questions">
-                                        <fieldset className="form-group" onChange={this.handleChangePregunta1}>
-                                            <legend>¿Estás de acuerdo con la realización del acuerdo de paz con las FARC?</legend>
-                                            <div className="form-check">
-                                                <label className="form-check-label">
-                                                    <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios1" value="si" />
-                                                    Sí</label>
-                                            </div>
-                                            <div className="form-check">
-                                                <label className="form-check-label">
-                                                    <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios2" value="no" />
-                                                    No</label>
-                                            </div>
-                                        </fieldset>
-                                        <button type="submit" className="btn btn-primary" onClick={this.handleAnswerQ1}>Aceptar</button>
+                                    <div className="col-md-1"></div>
+                                    <div className="col-md-5">
+                                    {
+                                                    this.renderFormQ1()
+                                                }
+                                        
+                                    </div>
+                                    <div className="col-md-5">
+                                        <div>
+                                            <h2>Historico de respuestas:</h2>
+                                            <svg id="river"> </svg>
+                                            <svg id="chartQuestion1"> </svg>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="col-md-5">
-                                    <div>
-                                        <h2>Historio de respuestas:</h2>
-                                        <svg id="river"> </svg>
-                                        <svg id="chartQuestion1"> </svg>
-                                        <p id="SiNo"> Sí No</p>
-                                    </div>
-                                </div>
-                            </div>
                             <br />
                             <div className="row">
-                                <div className="col-md-1"></div>
-                                <div className="col-md-5">
-                                    <div className="panel panel-white post panel-shadow questions">
-                                        <fieldset className="form-group" onChange={this.handleChangePregunta2}>
-                                            <legend>¿Estás de acuerdo con la participación de las FARC en la politica colombiana?</legend>
-                                            <div className="form-check">
-                                                <label className="form-check-label">
-                                                    <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios1" value="si" />
-                                                    Sí</label>
-                                            </div>
-                                            <div className="form-check">
-                                                <label className="form-check-label">
-                                                    <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios2" value="no" />
-                                                    No</label>
-                                            </div>
-                                        </fieldset>
-                                        <button type="submit" className="btn btn-primary" onClick={this.handleAnswerQ2}>Aceptar</button>
+                                    <div className="col-md-1"></div>
+                                    <div className="col-md-5">
+                                    {
+                                        this.renderFormQ2()
+                                    }
+                                        
+                                    </div>
+                                    <div className="col-md-5">
+                                        <div>
+                                            <h2>Historico de respuestas:</h2>
+                                            <svg id="chartQuestion2"> </svg>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="col-md-5">
-                                    <div>
-                                        <h2>Historio de respuestas:</h2>
-                                        <svg id="chartQuestion2"> </svg>
-                                        <p id="SiNo"> Sí No</p>
-                                    </div>
-                                </div>
-                            </div>
                             <br />
                             <div className="row">
-                                <div className="col-md-1"></div>
-                                <div className="col-md-5">
-                                    <div className="panel panel-white post panel-shadow questions">
-                                        <fieldset className="form-group" onChange={this.handleChangePregunta3}>
-                                            <legend>¿Estás de acuerdo con la realización de un acuerdo de paz con el ELN?</legend>
-                                            <div className="form-check">
-                                                <label className="form-check-label">
-                                                    <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios1" value="si" />
-                                                    Sí</label>
-                                            </div>
-                                            <div className="form-check">
-                                                <label className="form-check-label">
-                                                    <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios2" value="no" />
-                                                    No</label>
-                                            </div>
-                                        </fieldset>
-                                        <button type="submit" className="btn btn-primary" onClick={this.handleAnswerQ3}>Aceptar</button>
-                                    </div>
-                                </div>
-                                <div className="col-md-5">
-                                    <div>
-                                        <h2>Historio de respuestas:</h2>
-                                        <svg id="chartQuestion3"> </svg>
-                                        <p id="SiNo"> Sí No</p>
-                                    </div>
-                                </div>
-                            </div>
-                            {/** Section of comments**/}
-                            <div className="newComment">
-                                <h2>Expresa tu postura acerca del conflicto armado en Colombia</h2>
-                                <form>
-                                    <div className="form-group">
-                                        <label htmlFor="usr">Deja tu postura aquí:</label>
-                                        <input type="text" className="form-control panel panel-white post panel-shadow" id="commentTextBox" onChange={this.handleCommentChange} />
-                                        <br />
-                                        <button type="button" className="btn btn-primary" id="buttonComment" onClick={this.handleComment}>Send comment</button>
-                                    </div>
-                                </form>
-
-                            </div>
-                            <div className="comments">
-                                <div className="row">
-                                    <h2>Mira la postura de los demás</h2>
-                                    <div className="col-sm-8">
+                                    <div className="col-md-1"></div>
+                                    <div className="col-md-5">
                                         {
-                                            this.props.comments.map((c, i) => (
-                                                <div key={i + "a"} className="panel panel-white post panel-shadow">
-                                                    <div key={i + "b"} className="post-heading">
-                                                        <div key={i + "c"} className="pull-left image">
-                                                            <img key={i + "d"} src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNLzZszQbQf6jkknIGI8A3rj-0BoEngyi9156njfrCjPED9_b2vw" className="img-circle avatar" alt="user profile image" />
-                                                        </div>
-                                                        <div key={i + "e"} className="pull-left meta">
-                                                            <div key={i + "f"} className="title h5">
-                                                                <a key={i + "g"} href="#"><b>{c.name} </b></a>
-                                                            </div>
-
-
-                                                            <h6 key={i + "h"} className="text-muted time">{
-                                                                this.formatDate(c.dateCreated)
-                                                            }</h6>
-                                                        </div>
-                                                    </div>
-                                                    <br />
-                                                    <br />
-                                                    <div key={i + "i"} className="post-description">
-                                                        <p key={i + "j"} >{c.comment}</p>
-                                                    </div>
-                                                </div>
-                                            ))
+                                            this.renderFormQ3()
                                         }
                                     </div>
+                                    <div className="col-md-5">
+                                        <div>
+                                            <h2>Historico de respuestas:</h2>
+                                            <svg id="chartQuestion3"> </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                             {/** Section of comments**/}
+                             <div className="newComment">
+                                    <h2>Expresa tu postura acerca del conflicto armado en Colombia</h2>
+                                    <form>
+                                        <div className="form-group">
+                                            <label htmlFor="usr">Deja tu postura aquí:</label>
+                                            <input type="text" className="form-control panel panel-white post panel-shadow" id="commentTextBox" onChange={this.handleCommentChange} />
+                                            <br />
+                                            <button type="button" id="buttonComment" onClick={this.handleComment}>Enviar comentario</button>
+                                        </div>
+                                    </form>
 
                                 </div>
-                            </div>
+                                <div className="comments">
+                                    <div className="row">
+                                        <h2>Mira la postura de los demás</h2>
+                                        <div className="col-sm-8">
+                                            {
+                                                this.props.comments.map((c, i) => (
+                                                    <div key={i + "a"} className="panel panel-white post panel-shadow">
+                                                        <div key={i + "b"} className="post-heading">
+                                                            <div key={i + "c"} className="pull-left image">
+                                                                <img key={i + "d"} src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNLzZszQbQf6jkknIGI8A3rj-0BoEngyi9156njfrCjPED9_b2vw" className="img-circle avatar" alt="user profile image" />
+                                                            </div>
+                                                            <div key={i + "e"} className="pull-left meta">
+                                                                <div key={i + "f"} className="title h5">
+                                                                    <a key={i + "g"} href="#"><b>{c.name} </b></a>
+                                                                </div>
 
-                            <br />
-                            <br />
+
+                                                                <h6 key={i + "h"} className="text-muted time">{
+                                                                    this.formatDate(c.dateCreated)
+                                                                }</h6>
+                                                            </div>
+                                                        </div>
+                                                        <br />
+                                                        <br />
+                                                        <div key={i + "i"} className="post-description">
+                                                            <p key={i + "j"} >{c.comment}</p>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            }
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <br />
+                                <br />
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        );
+            );
+        }
     }
-}
 
-export default withTracker(() => {
-    Meteor.subscribe("comments");
-    return {
-        comments: Comments.find({}).fetch(),
-    }
-})(Scrollytelling);
+    export default withTracker(() => {
+        Meteor.subscribe("comments");
+        return {
+            comments: Comments.find({}).fetch(),
+        }
+    }) (Scrollytelling);
