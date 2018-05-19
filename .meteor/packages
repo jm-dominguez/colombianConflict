@@ -21,3 +21,5 @@ http
 accounts-ui
 accounts-password
 react-meteor-data
+force-ssl
+meteorhacks:inject-initial
