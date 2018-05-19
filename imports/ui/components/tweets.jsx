@@ -7,7 +7,7 @@ export default class Tweet extends Component {
       <div className="tweet container">
           <div className="row">
             <div className="col-sm-2">
-                <img className="tweet-img" src={this.props.img}/>
+                <img className="tweet-img" src={this.props.img} alt="twitter-user-image"/>
             </div>
             <div className="col-sm-10">
                 <div className="row">

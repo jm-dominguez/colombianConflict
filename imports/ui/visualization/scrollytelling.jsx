@@ -3,6 +3,7 @@ import * as d3 from "d3";
 import Tweet from "../components/tweets.jsx";
 import { Comments } from "../../api/Comments.js";
 import { withTracker } from "meteor/react-meteor-data";
+import { timelines } from "d3-timelines";
 
 import "./scroll.css";
 
@@ -135,8 +136,9 @@ class Scrollytelling extends React.Component {
 
     }
 
-    renderTweets() {
-        if (this.state.farcTweets) {
+
+    renderTweets(tweets) {
+        if (tweets) {
             let tweets = this.state.farcTweets.data.statuses;
             return tweets.map((tweet, i) => (
                 <Tweet key={i} img={tweet.user.profile_image_url_https} name={tweet.user.name} screenName={tweet.user.screen_name} text={tweet.text} />
@@ -449,7 +451,7 @@ class Scrollytelling extends React.Component {
 
             d3.select("#datos-generales").transition(t2).style("opacity", 0);
             d3.select("#antecedentes").transition(t3).style("opacity", 1);
-            d3.select("#farc").transition(t4).style("opacity", 0);
+            d3.select("#actores").transition(t4).style("opacity", 0);
             d3.select("svg").remove();
             d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
             let g = d3.select("svg");
@@ -466,13 +468,38 @@ class Scrollytelling extends React.Component {
 
         functions.push(step1);
 
-        let stepELN = function () {
+        let actores = function(){
             let t = d3.transition("image").duration(1000);
             let t2 = d3.transition("prevStep").duration(1000);
             let t3 = d3.transition("thisStep").duration(1000);
             let t4 = d3.transition("nextStep").duration(1000);
 
             d3.select("#antecedentes").transition(t2).style("opacity", 0);
+            d3.select("#actores").transition(t3).style("opacity", 1);
+            d3.select("#ELN").transition(t4).style("opacity", 0);
+            d3.select("svg").remove();
+            d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
+            let g = d3.select("svg");
+            g.append("svg:image")
+                .attr('xlink:href', 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Flag_of_Colombia.svg/1280px-Flag_of_Colombia.svg.png')
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .style("opacity", 0)
+                .transition(t)
+                .style("opacity", 1);
+        }
+
+        functions.push(actores);
+
+        let stepELN = function () {
+            let t = d3.transition("image").duration(1000);
+            let t2 = d3.transition("prevStep").duration(1000);
+            let t3 = d3.transition("thisStep").duration(1000);
+            let t4 = d3.transition("nextStep").duration(1000);
+
+            d3.select("#actores").transition(t2).style("opacity", 0);
             d3.select("#ELN").transition(t3).style("opacity", 1);
             d3.select("#M19").transition(t4).style("opacity", 0);
             d3.select("svg").remove();
@@ -623,7 +650,7 @@ class Scrollytelling extends React.Component {
             let t4 = d3.transition("nextStep").duration(1000);
             d3.select("#auc").transition(t2).style("opacity", 0);
             d3.select("#participacion").transition(t3).style("opacity", 1);
-            d3.select("#paz").transition(t4).style("opacity", 0);
+            d3.select("#eventos").transition(t4).style("opacity", 0);
             d3.select("svg").remove();
             d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
 
@@ -693,20 +720,89 @@ class Scrollytelling extends React.Component {
         }
 
         functions.push(stepParticipacion);
-        let step4 = function () {
+        let stepEventos = function(){
             let t = d3.transition("image").duration(1000);
             let t2 = d3.transition("prevStep").duration(1000);
             let t3 = d3.transition("thisStep").duration(1000);
             let t4 = d3.transition("nextStep").duration(1000);
 
             d3.select("#participacion").transition(t2).style("opacity", 0);
-            d3.select("#paz").transition(t3).style("opacity", 1);
-            d3.select("#end").transition(t4).style("opacity", 0);
+            d3.select("#eventos").transition(t3).style("opacity", 1);
+            d3.select("#pal-justicia").transition(t4).style("opacity", 0);
+            d3.select("svg").remove();
+
+            let datos = [{
+                label: "Toma Palacio de Justicia",
+                times:[{
+                    "starting_time": 500101200000,
+                    "ending_time": 500187600000
+                }]
+            },{
+                label: "Proceso 8000",
+                times: [{
+                    "starting_time": 805957200000,
+                    "ending_time": 836629200000
+                }]
+
+            },{
+                label: "Toma de Mitú",
+                times: [{
+                    "starting_time": 909896400000,
+                    "ending_time": 910155600000
+                }]
+            },{
+                label:"Negociaciones de El Caguán",
+                times: [{
+                    "starting_time": 915685200000,
+                    "ending_time": 1014267600000
+                }]
+            }, {
+                label: "Gobierno de Uribe",
+                times: [{
+                    "starting_time": 1028696400000,
+                    "ending_time": 1281157200000
+                }]
+            }, {
+                label: "Diálogos de Paz",
+                times: [{
+                    "starting_time": 1315112400000,
+                    "ending_time": 1474866000000
+                }]
+            }];
+
+            var chart = timelines()
+                        .beginning(datos[0].times[0].starting_time)
+                        .ending(datos[5].times[0].ending_time)
+                        .stack()
+                        .tickFormat({
+                            format: d3.timeFormat("%Y"),
+                            tickTime: d3.timeYear,
+                            tickInterval: 10,
+                            tickSize: 10,
+                            tickValues: null
+                        });
+ 
+            var svg = d3.select("#vis").append("svg").attr("width", 600).attr("height", 600).attr("transform", "translate(0, 100)")
+                        .datum(datos).call(chart);
+            svg.style("opacity", 0).transition(t).style("opacity", 1);
+                        
+           
+        }
+        functions.push(stepEventos);
+        let palJusticia = function(){
+            let t = d3.transition("image").duration(1000);
+            let t2 = d3.transition("prevStep").duration(1000);
+            let t3 = d3.transition("thisStep").duration(1000);
+            let t4 = d3.transition("nextStep").duration(1000);
+
+            d3.select("#eventos").transition(t2).style("opacity", 0);
+            d3.select("#pal-justicia").transition(t3).style("opacity", 1);
+            d3.select("#tweets-pal").transition(t4).style("opacity", 0);
             d3.select("svg").remove();
             d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
             let g = d3.select("svg");
             g.append("svg:image")
-                .attr('xlink:href', 'https://360radio.com.co/wp-content/uploads/2016/09/Santos-Farc-Castro-Colombia.jpg')
+                .attr('xlink:href', 'https://www.elheraldo.co/sites/default/files/styles/width_860/public/articulo/2015/11/06/d0199733_0.jpg?itok=6im3s9-6')
                 .attr("x", 0)
                 .attr("y", 0)
                 .attr("width", "100%")
@@ -716,13 +812,299 @@ class Scrollytelling extends React.Component {
                 .style("opacity", 1);
         }
 
+        functions.push(palJusticia);
+        let tweetsPal = function(){
+            let t = d3.transition("image").duration(1000);
+            let t2 = d3.transition("prevStep").duration(1000);
+            let t3 = d3.transition("thisStep").duration(1000);
+            let t4 = d3.transition("nextStep").duration(1000);
+
+            d3.select("#pal-justicia").transition(t2).style("opacity", 0);
+            d3.select("#tweets-pal").transition(t3).style("opacity", 1);
+            d3.select("#caguan").transition(t4).style("opacity", 0);
+            d3.select("svg").remove();
+            d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
+            let g = d3.select("svg");
+            g.append("svg:image")
+                .attr('xlink:href', 'https://www.elheraldo.co/sites/default/files/styles/width_860/public/articulo/2015/11/06/d0199733_0.jpg?itok=6im3s9-6')
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", "100%")
+                .attr("height", "100%");
+        }
+        functions.push(tweetsPal);
+        let fantasma2 = function(){
+            let t3 = d3.transition("thisStep").duration(1000);
+            d3.select("#tweets-pal").transition(t3).style("opacity", 1);
+        }
+        functions.push(fantasma2);
+        let caguan = function(){
+            let t = d3.transition("image").duration(1000);
+            let t2 = d3.transition("prevStep").duration(1000);
+            let t3 = d3.transition("thisStep").duration(1000);
+            let t4 = d3.transition("nextStep").duration(1000);
+
+            d3.select("#tweets-pal").transition(t2).style("opacity", 0);
+            d3.select("#caguan").transition(t3).style("opacity", 1);
+            d3.select("#tweets-caguan").transition(t4).style("opacity", 0);
+            d3.select("svg").remove();
+            d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
+            let g = d3.select("svg");
+            g.append("svg:image")
+                .attr('xlink:href', 'https://static.iris.net.co/semana/upload/images/2015/10/25/447673_225453_1.jpg')
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .style("opacity", 0)
+                .transition(t)
+                .style("opacity", 1);
+        }
+
+        functions.push(caguan);
+        let tweetsCaguan = function(){
+            let t = d3.transition("image").duration(1000);
+            let t2 = d3.transition("prevStep").duration(1000);
+            let t3 = d3.transition("thisStep").duration(1000);
+            let t4 = d3.transition("nextStep").duration(1000);
+
+            d3.select("#caguan").transition(t2).style("opacity", 0);
+            d3.select("#tweets-caguan").transition(t3).style("opacity", 1);
+            d3.select("#masacres").transition(t4).style("opacity", 0);
+            d3.select("svg").remove();
+            d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
+            let g = d3.select("svg");
+            g.append("svg:image")
+                .attr('xlink:href', 'https://static.iris.net.co/semana/upload/images/2015/10/25/447673_225453_1.jpg')
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", "100%")
+                .attr("height", "100%");
+        }
+        functions.push(tweetsCaguan);
+        let fantasma3 = function(){
+            let t3 = d3.transition("thisStep").duration(1000);
+            d3.select("#tweets-caguan").transition(t3).style("opacity", 1);
+        }
+        functions.push(fantasma3);
+        let masacres = function(){
+            let t = d3.transition("image").duration(1000);
+            let t2 = d3.transition("prevStep").duration(1000);
+            let t3 = d3.transition("thisStep").duration(1000);
+            let t4 = d3.transition("nextStep").duration(1000);
+
+            d3.select("#tweets-caguan").transition(t2).style("opacity", 0);
+            d3.select("#masacres").transition(t3).style("opacity", 1);
+            d3.select("#secuestros").transition(t4).style("opacity", 0);
+            d3.select("svg").remove();
+            var margin = {top: 100, right: 100, bottom: 100, left: 150},
+                         width = 600 - margin.left - margin.right,
+                         height = 600 - margin.top - margin.bottom;
+            
+            
+            let datos =[{
+                actor: "Grupos Paramilitares",
+                valor: 0.588
+            }, {
+                actor: "Guerrillas",
+                valor: 0.173
+            },{
+                actor: "Fuerza Pública",
+                valor: 0.08
+            }, {
+                actor: "Grupo no identificado",
+                valor: 0.149
+            },{
+                actor: "Otros",
+                valor: 0.01
+            }];
+
+            datos.forEach(function(d) {
+                d.valor = +d.valor;
+              });
+            
+            var y = d3.scaleBand()
+                        .range([height, 0])
+                        .padding(0.1);
+
+            var x = d3.scaleLinear()
+                        .range([0, width]);
+
+            var svg = d3.select("#vis").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", 
+                  "translate(" + margin.left + "," + margin.top + ")");
+
+            x.domain([0, d3.max(datos, function(d){ return d.valor; })])
+            y.domain(datos.map(function(d) { return d.actor; }));
+
+            let tb = d3.transition("bar").duration(1000);
+
+            svg.selectAll(".bar")
+               .data(datos)
+               .enter().append("rect")
+               .attr("class", "bar")
+               .transition(tb)
+               .attr("width", function(d) {return x(d.valor); } )
+               .attr("y", function(d) { return y(d.actor); })
+               .attr("height", y.bandwidth())
+               .style("fill", "#229934");
+            
+               svg.append("g")
+               .attr("transform", "translate(0," + height + ")")
+               .call(d3.axisBottom(x))
+
+               svg.append("g")
+                  .call(d3.axisLeft(y));
+
+               svg.style("opacity", 0).transition(t).style("opacity", 1);
+        }
+        functions.push(masacres);
+
+        let secuestros = function(){
+            let datos = [{
+                actor: "Grupos Paramilitares",
+                valor: 0.094
+            },
+            {
+                actor: "Guerrillas",
+                valor: 0.906
+            }];
+            let t = d3.transition("image").duration(1000);
+            let t2 = d3.transition("prevStep").duration(1000);
+            let t3 = d3.transition("thisStep").duration(1000);
+            let t4 = d3.transition("nextStep").duration(1000);
+
+            d3.select("#masacres").transition(t2).style("opacity", 0);
+            d3.select("#secuestros").transition(t3).style("opacity", 1);
+            d3.select("#paz").transition(t4).style("opacity", 0);
+            d3.select("svg").remove();
+            d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
+
+            var svg = d3.select("svg"),
+                margin = { top: 20, right: 20, bottom: 30, left: 40 },
+                width = +svg.attr("width") - margin.left - margin.right,
+                height = +svg.attr("height") - margin.top - margin.bottom;
+
+            var x = d3.scaleBand().rangeRound([0, width]).padding(0.1),
+                y = d3.scaleLinear().rangeRound([height, 0]);
+
+            var g = svg.append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            d3.select("svg").style("opacity", 0).transition(t).style("opacity", 1);
+
+            datos.forEach(function (d) {
+                d.valor = +d.valor;
+            });
+
+            x.domain(datos.map(function (d) { return d.actor; }));
+            y.domain([0, d3.max(datos, function (d) { return d.valor; })]);
+
+            g.append("g")
+                .attr("class", "axis axis--x")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x));
+
+            g.append("g")
+                .attr("class", "axis axis--y")
+                .call(d3.axisLeft(y).ticks(10, "%"))
+                .append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 6)
+                .attr("dy", "0.71em")
+                .attr("text-anchor", "end")
+                .text("Secuestros");
+
+            let tb = d3.transition("bar").duration(1000);
+
+            let bars = g.selectAll(".bar")
+                .data(datos)
+                .enter().append("rect")
+                .attr("class", "bar")
+                .attr("x", function (d) { return x(d.actor); })
+                .attr("y", function (d) { return y(d.valor); })
+                .style("fill", "#E8B121")
+                .attr("width", x.bandwidth());
+
+            bars
+                .transition(tb)
+                .attr("height", function (d) { return height - y(d.valor); });
+            bars
+                .on("mouseover", function (d) {
+                    let g = d3.select(this)
+                        .style("cursor", "pointer")
+                        .style("opacity", 0.7)
+                        .append("g")
+                        .attr("class", "text-group");
+                })
+                .on("mouseout", function (d) {
+                    d3.select(this)
+                        .style("cursor", "none")
+                        .style("opacity", 1)
+                        .select(".text-group").remove();
+                });
+
+        }
+        functions.push(secuestros);
+        let step4 = function () {
+            let t = d3.transition("image").duration(1000);
+            let t2 = d3.transition("prevStep").duration(1000);
+            let t3 = d3.transition("thisStep").duration(1000);
+            let t4 = d3.transition("nextStep").duration(1000);
+
+            d3.select("#secuestros").transition(t2).style("opacity", 0);
+            d3.select("#paz").transition(t3).style("opacity", 1);
+            d3.select("#referencias").transition(t4).style("opacity", 0);
+            d3.select("svg").remove();
+            d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
+            let g = d3.select("svg");
+            g.append("svg:image")
+                .attr('xlink:href', 'https://elpais.com/internacional/imagenes/2015/09/23/actualidad/1443034878_643790_1443076625_noticia_fotograma.jpg')
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .style("opacity", 0)
+                .transition(t)
+                .style("opacity", 1);
+
+           
+        }
+
         functions.push(step4);
+
+        let referencias = function(){
+            let t = d3.transition("image").duration(1000);
+            let t2 = d3.transition("prevStep").duration(1000);
+            let t3 = d3.transition("thisStep").duration(1000);
+            let t4 = d3.transition("nextStep").duration(1000);
+            d3.select("#paz").transition(t2).style("opacity", 0);
+            d3.select("#referencias").transition(t3).style("opacity", 1);
+            d3.select("#end").transition(t4).style("opacity",0)
+            d3.select("svg").remove();
+            d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
+            let g = d3.select("svg");
+            g.append("svg:image")
+                .attr('xlink:href', '')
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .style("opacity", 0)
+                .transition(t)
+                .style("opacity", 1);
+        }
+
+        functions.push(referencias);
 
         let step5 = function () {
             let t = d3.transition("image").duration(1000);
             let t2 = d3.transition("prevStep").duration(1000);
             let t3 = d3.transition("thisStep").duration(1000);
-            d3.select("#paz").transition(t2).style("opacity", 0);
+            d3.select("#referencias").transition(t2).style("opacity", 0);
             d3.select("#end").transition(t3).style("opacity", 1);
             d3.select("svg").remove();
             d3.select("#vis").append("svg").attr("width", 600).attr("height", 600);
@@ -982,6 +1364,15 @@ class Scrollytelling extends React.Component {
     -                                   no tradicionales, lo cual dió lugar a los grupos insurgentes conocidos como bandoleros.
                                     </p>
                                 </section>
+                                <section className="step" id="actores">
+                                    <h1> Actores </h1>
+                                    <p>
+                                        A lo largo del conflicto, se han visto envueltos diferentes actores con diferentes ideologías políticas,
+                                        entre estos se encuentran los grupos guerrilleros de izquierda como el ELN, el EPL, el M-19 o las FARC. Adicionalmente,
+                                        hace parte del conflicto los grupos paramilitares o autodefensas, entre las cuales destacan las AUC. Finalmente, el último
+                                        gran participante es el estado colombiano. 
+                                    </p>
+                                </section>
                                 <section className="step" id="ELN">
                                     <h1> Fundación ELN </h1>
                                     <p>
@@ -1009,7 +1400,7 @@ class Scrollytelling extends React.Component {
                                 <section className="step" id="tweets-farc">
                                     <h1> Algunos Tweets sobre FARC </h1>
                                     <div className="container">
-                                        {this.renderTweets()}
+                                        {this.renderTweets(this.state.farcTweets)}
                                     </div>
                                 </section>
                                 <section className="step" id="fantasma1">
@@ -1032,6 +1423,60 @@ class Scrollytelling extends React.Component {
 
                                     </p>
                                 </section>
+                                <section className="step" id="eventos">
+                                    <h1> Eventos </h1>
+                                    <p>
+                                        A lo largo del conflicto han ocurrido diversos sucesos que han marcado la historia del país.
+                                        Desde atentados terroristas, hasta negociaciones de paz fallidas, y procesos de desmovilización.
+                                        Entre los más destacados se encuentra, la toma del palacio de justicia, las negociaciones de paz de San 
+                                        Vicente del Caguán, la Operación Jaque y el tratado de paz recientemente consumado.
+                                    </p>
+                                </section>
+                                <section className="step" id="pal-justicia">
+                                    <h1> Toma del Palacio de Justicia </h1>
+                                    <p>
+                                        En los días 6 y 7 de Noviembre del año 1985, el M-19 perpetra la toma del palacio de justicia de Bogotá. En 
+                                        el inicio del suceso, el grupo guerrillero mantuvo 350 rehénes. Sin embargo, con el paso del tiempo la situación 
+                                        se violentó y dejó un saldo de 98 muertos. A día de hoy, aún no se cuenta con cifras exactas para evaluar el número de 
+                                        víctimas.
+                                    </p>
+                                </section>
+                                <section className="step" id="tweets-pal">
+                                    {this.renderTweets(this.state.pJusticiaTweets)}
+                                </section>
+                                <section className="step">
+                                    <h1> Fill in content to allow better transitions </h1>
+                                </section>
+                                <section className="step" id="caguan">
+                                    <h1> Negociaciones en San Vicente del Caguán </h1>
+                                    <p>
+                                        El 7 de enero de 1999 el gobierno del presidente Andrés Pastrana, establece una zona de distención en el municipio de 
+                                        San Vicente del Caguán, con el objetivo de entablar diálogos de paz con las FARC. Dichas negociaciones se extenderían durante 
+                                        alrededor de tres años. Estas finalizan el 21 de Febrero de 2002, con el rompimiento del diálogo y tienen como resultado, la 
+                                        implementación del Plan Colombia, por parte del estado colombiano.
+                                    </p>
+                                </section>
+                                <section className="step" id="tweets-caguan">
+                                    {this.renderTweets(this.state.caguanTweets)}
+                                </section>
+                                <section className="step">
+                                    <h1> Fill in content to allow better transitions </h1>
+                                </section>
+                                <section className="step" id="masacres">
+                                    <h1>Masacres</h1>
+                                    <p>
+                                    Desde 1985 a 2012 han ocurrido 1982 masacres. 1.166 (58.8%) de estas fueron cometidos por grupos paramilitares, 343 (17.3%) por guerrillas, 
+                                    158 (8%) por fuerza pública, 295 (14.9%) por grupos armados no identificados y 20 (1%) por grupos paramilitares y miembros de la fuerza pública 
+                                    u otros grupos armados. Entre las más destacadas se encuentran la toma a Mitú y la toma a Miraflores, ambas perpetradas por las FARC.
+                                    </p>
+                                </section>
+                                <section className="step" id="secuestros">
+                                    <h1> Secuestros </h1>
+                                    <p>
+                                    En Colombia, entre los años de 1958 y 2012, han secuestrado a 27.023 personas. 24.482 (90.6%) personas han sido secuestradas por guerrillas y 2.541 (9.4%) 
+                                    por grupos paramilitares.
+                                    </p>
+                                </section>
                                 <section className="step" id="paz">
                                     <h1> Tratado de Paz </h1>
 
@@ -1042,9 +1487,23 @@ class Scrollytelling extends React.Component {
                                         de desarme y posteriormente, la reintegración a la vida civil.
                                 </p>
                                 </section>
+                                <section className="step" id="referencias">
+                                    <h1> Referencias </h1>
+                                    <p> La información e imágenes contenidas en esta página provienen de: </p>
+                                    <ul>
+                                        <li> <a href="http://www.eltiempo.com/" target="_blank"> El Tiempo </a> </li>
+                                        <li> <a href="http://www.elespectador.com/" target="_blank"> El espectador </a> </li>
+                                        <li> <a href="http://www.centrodememoriahistorica.gov.co/micrositios/informeGeneral/estadisticas.html" target="_blank">Centro de Memoria Histórica </a> </li>
+                                        <li> <a href = "https://es.wikipedia.org/wiki/Conflicto_armado_interno_en_Colombia" target="_blank"> Wikipedia </a> </li>
+                                    </ul>
+                                </section>
                                 <section className="step" id="end">
                                     <strong>
                                         <h1 id="gracias"> Gracias </h1>
+                                        <p>
+                                           No puedes separar la paz de la libertad, porque nadie puede estar en paz, a no ser que tenga su libertad.
+                                        </p> 
+                                        -Malcolm X
                                     </strong>
                                 </section>
                             </div>
