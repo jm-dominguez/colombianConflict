@@ -184,8 +184,8 @@ class Scrollytelling extends React.Component {
 
     renderTweets(tweets) {
         if (tweets) {
-            let tweets = this.state.farcTweets.data.statuses;
-            return tweets.map((tweet, i) => (
+            let tweetst = tweets.data.statuses;
+            return tweetst.map((tweet, i) => (
                 <Tweet key={i} img={tweet.user.profile_image_url_https} name={tweet.user.name} screenName={tweet.user.screen_name} text={tweet.text} />
             ));
         }
