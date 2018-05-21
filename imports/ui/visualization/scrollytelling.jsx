@@ -1555,6 +1555,7 @@ class Scrollytelling extends React.Component {
             if (Meteor.user().profile.q1.split("/")[0] === "no") {
                 return (
                     <div>
+                        {/*Cada una de las preguntas se deberia encapsular en un componente igual*/}
                         <div className="panel panel-white post panel-shadow questions">
                             <fieldset className="form-group" onChange={this.handleChangePregunta1}>
                                 <legend>¿Estás de acuerdo con la realización del acuerdo de paz con las FARC?</legend>
@@ -1577,6 +1578,7 @@ class Scrollytelling extends React.Component {
             else if (Meteor.user().profile.q1.split("/")[0] === "yes") {
                 return (
                     <div>
+                        {/*Cada una de las preguntas se deberia encapsular en un componente igual*/}
                         <div className="panel panel-white post panel-shadow questions">
                             <fieldset className="form-group" onChange={this.handleChangePregunta1}>
                                 <legend>¿Estás de acuerdo con la realización del acuerdo de paz con las FARC?</legend>
@@ -1590,7 +1592,8 @@ class Scrollytelling extends React.Component {
 
         else {
             return (
-                <div>
+                <div
+                    {/*Cada una de las preguntas se deberia encapsular en un componente igual*/}
                     <div className="panel panel-white post panel-shadow questions">
                         <fieldset className="form-group" onChange={this.handleChangePregunta1}>
                             <legend>¿Estás de acuerdo con la realización del acuerdo de paz con las FARC?</legend>
